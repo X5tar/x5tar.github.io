@@ -40,9 +40,9 @@
       <category term="心路历程" scheme="https://x5tar.com/categories/%E5%BF%83%E8%B7%AF%E5%8E%86%E7%A8%8B/"/>
     
     
-      <category term="学习" scheme="https://x5tar.com/tags/%E5%AD%A6%E4%B9%A0/"/>
-    
       <category term="Git" scheme="https://x5tar.com/tags/Git/"/>
+    
+      <category term="学习" scheme="https://x5tar.com/tags/%E5%AD%A6%E4%B9%A0/"/>
     
   </entry>
   
@@ -68,11 +68,11 @@
       <category term="心路历程" scheme="https://x5tar.com/categories/%E5%BF%83%E8%B7%AF%E5%8E%86%E7%A8%8B/"/>
     
     
+      <category term="学习" scheme="https://x5tar.com/tags/%E5%AD%A6%E4%B9%A0/"/>
+    
       <category term="Flask" scheme="https://x5tar.com/tags/Flask/"/>
     
       <category term="安全" scheme="https://x5tar.com/tags/%E5%AE%89%E5%85%A8/"/>
-    
-      <category term="学习" scheme="https://x5tar.com/tags/%E5%AD%A6%E4%B9%A0/"/>
     
   </entry>
   

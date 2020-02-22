@@ -134,21 +134,61 @@
                     .comments{margin:30px;padding:10px;background:transparent}
                     @media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:transparent}}
                   </style>
-                  <div class="valine_comment"></div>
+                  <div id="vcomments"></div>
+<!-- <div class="valine_comment"></div> -->
 <!--载入js，在</body>之前插入即可-->
 <!--Leancloud 操作库:-->
 <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
 <!--Valine 的核心代码库-->
 <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery/1.10.2/jquery.min.js"></script>
 <script>
   new Valine({
-      el: '.valine_comment',
+      el: '#vcomments',
       app_id: 'iAbQo5y0XlBlUP9F0K3Tyx8f-MdYXbMMI',
       app_key: 'ML5YMAAFe45gCJawVJcUkrg0',
       placeholder: '请在这里留言',
       notify: 'true',
       verify: 'true',
     });
+
+$(document).ready(function(){ 
+    if($("#vcomments").html()){
+        var c_name = $('#vcomments input[name="nick"]');
+        var c_mail = $('#vcomments input[type="email"]');
+        var c_text = $('#veditor');
+        var mailzz = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/;
+        var c_placeholder = c_text.attr('placeholder');
+        $(".vcontrol .text-right button").hide();
+        $(".vcontrol .text-right").prepend('<span class="submit_f vbtn">回复</span>');
+        $('body').on('click','.submit_f',function(){
+            if(nullpd(c_name.val())){ 
+                alert("昵称不能为空");
+                return false;
+            }
+            if(nullpd(c_mail.val())){ 
+                alert("邮箱不能为空");
+                return false;
+            }
+            if(!mailzz.test(c_mail.val())){
+                alert("邮箱无效");
+                return false;
+            }
+            if(!c_text.val()){
+                alert("留言评论不能为空");
+                return false;
+            }
+            $('.vsubmit').click();
+        });
+        function nullpd(str){
+            if(str == "" || str == null || str == undefined){
+                return true;
+            }else{
+                return false;
+            }
+        }
+     }
+    }); 
 </script>
                 </section>
             
