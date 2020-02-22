@@ -278,9 +278,34 @@
             
         </section>
 
+        
+            <section id="comments" class="comments">
+              <style>
+                .comments{margin:30px;padding:10px;background:#fff}
+                @media screen and (max-width:800px){.comments{margin:auto;padding:10px;background:#fff}}
+              </style>
+              <div class="valine_comment"></div>
+<!--载入js，在</body>之前插入即可-->
+<!--Leancloud 操作库:-->
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<!--Valine 的核心代码库-->
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+      el: '.valine_comment',
+      app_id: 'iAbQo5y0XlBlUP9F0K3Tyx8f-MdYXbMMI',
+      app_key: 'ML5YMAAFe45gCJawVJcUkrg0',
+      placeholder: '请在这里留言',
+      notify: 'true',
+      verify: 'true',
+    });
+</script>
+            </section>
+        
 
     </article>
 </div>
+
 
         </div>
         <footer id="footer" class="footer">
