@@ -1,0 +1,1 @@
+document.ready(function(){var e=document.getElementById("curYear"),n=new Date;e.innerHTML=n.getFullYear()});
