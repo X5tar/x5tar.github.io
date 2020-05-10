@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://x5tar.com/"/>
-  <updated>2020-05-03T12:47:41.277Z</updated>
+  <updated>2020-05-10T03:07:36.619Z</updated>
   <id>https://x5tar.com/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Linux 中的 source 命令（点命令）</title>
+    <link href="https://x5tar.com/2020/05/10/source-command/"/>
+    <id>https://x5tar.com/2020/05/10/source-command/</id>
+    <published>2020-05-10T02:26:57.000Z</published>
+    <updated>2020-05-10T03:07:36.619Z</updated>
+    
+    <content type="html"><![CDATA[<p>在做题的时候遇到了上传了 shell 脚本但是没有执行权限的情况</p><p>测试脚本</p><img src="/2020/05/10/source-command/shell.png" title="shell"><p>本地测试结果</p><img src="/2020/05/10/source-command/denied.png" title="denied"><p>然后就发现了 source 命令</p><img src="/2020/05/10/source-command/source.png" title="source"><p>点命令（错误示范）</p><img src="/2020/05/10/source-command/dot_error.png" title="dot_error"><p>点命令（必须加 ./）</p><img src="/2020/05/10/source-command/dot.png" title="dot"><p>source 命令和点命令在作用上完全相同</p><p>而除了可以不需要执行权限外，source 命令（点命令）还有一个特性，即 source 命令是在本 shell 内执行，而 直接执行脚本是在新开 shell 中执行，即 source 命令可以设置当前 shell 的环境变量，故常用来使修改过的初始化文件（.bashrc .profile 等）立即生效</p><p>测试脚本</p><img src="/2020/05/10/source-command/env.png" title="env"><p>直接执行</p><img src="/2020/05/10/source-command/env_shell.png" title="env_shell"><p>source 命令</p><img src="/2020/05/10/source-command/env_source.png" title="env_source"><p>点命令</p><img src="/2020/05/10/source-command/env_dot.png" title="env_dot">]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;在做题的时候遇到了上传了 shell 脚本但是没有执行权限的情况&lt;/p&gt;&lt;p&gt;测试脚本&lt;/p&gt;&lt;img src=&quot;/2020/05/10/source-command/shell.png&quot; title=&quot;shell&quot;&gt;&lt;p&gt;本地测试结果&lt;/p&gt;&lt;img src=&quot;/2020
+      
+    
+    </summary>
+    
+    
+      <category term="杂项" scheme="https://x5tar.com/categories/%E6%9D%82%E9%A1%B9/"/>
+    
+    
+      <category term="Linux" scheme="https://x5tar.com/tags/Linux/"/>
+    
+  </entry>
   
   <entry>
     <title>PHP 中不包含字母和数字的 webshell</title>
@@ -114,9 +140,9 @@
       <category term="心路历程" scheme="https://x5tar.com/categories/%E5%BF%83%E8%B7%AF%E5%8E%86%E7%A8%8B/"/>
     
     
-      <category term="Git" scheme="https://x5tar.com/tags/Git/"/>
-    
       <category term="学习" scheme="https://x5tar.com/tags/%E5%AD%A6%E4%B9%A0/"/>
+    
+      <category term="Git" scheme="https://x5tar.com/tags/Git/"/>
     
   </entry>
   
@@ -144,9 +170,9 @@
     
       <category term="WEB安全" scheme="https://x5tar.com/tags/WEB%E5%AE%89%E5%85%A8/"/>
     
-      <category term="学习" scheme="https://x5tar.com/tags/%E5%AD%A6%E4%B9%A0/"/>
-    
       <category term="Flask" scheme="https://x5tar.com/tags/Flask/"/>
+    
+      <category term="学习" scheme="https://x5tar.com/tags/%E5%AD%A6%E4%B9%A0/"/>
     
   </entry>
   
