@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://x5tar.com/friends/</loc>
+    
+    <lastmod>2020-06-08T12:51:32.939Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://x5tar.com/2020/05/03/php-webshell-without-alpha-and-num/</loc>
     
     <lastmod>2020-06-08T12:46:38.566Z</lastmod>
@@ -33,13 +40,6 @@
     <loc>https://x5tar.com/2020/05/10/source-command/</loc>
     
     <lastmod>2020-05-10T03:07:36.619Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://x5tar.com/friends/</loc>
-    
-    <lastmod>2020-05-07T02:36:53.703Z</lastmod>
     
   </url>
   
