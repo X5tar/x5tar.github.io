@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://x5tar.com/search/</loc>
+    
+    <lastmod>2020-07-13T09:51:20.581Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://x5tar.com/2020/05/03/php-webshell-without-alpha-and-num/</loc>
     
-    <lastmod>2020-06-24T02:43:29.340Z</lastmod>
+    <lastmod>2020-07-07T09:37:10.635Z</lastmod>
     
   </url>
   
