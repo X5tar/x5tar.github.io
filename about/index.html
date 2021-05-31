@@ -5,29 +5,29 @@
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="noodp" name="robots"/>
 <meta content="IE=edge, chrome=1" http-equiv="X-UA-Compatible"/>
-<title>Linux Cron 定时任务 - X5tar's Blog</title><meta content="" name="Description"/><meta content="Linux Cron 定时任务" property="og:title"/>
-<meta content="0x00 前言 在做一道涉及到 redis 未授权访问的题的时候，看到了使用到 /var/spool/cron/ 目录反弹 shell 后查询得知 Linux Cron 定时任务，在此记录下来 0x01 相关文件 与 Cron 相关的文件主要存在以下" property="og:description"/>
+<title>About 🌟 - X5tar's Blog</title><meta content="" name="Description"/><meta content="About 🌟" property="og:title"/>
+<meta content="自我介绍（迫真 某男子职业技术学院在读 CNSS / CTFer / WEB🐶 跟随大佬们脚步的菜鸡 业余代码搬运工 LOL 最强黑铁，0 / 21 / 0" property="og:description"/>
 <meta content="article" property="og:type"/>
-<meta content="https://x5tar.com/posts/linux-crontab/" property="og:url"/><meta content="posts" property="article:section"/>
-<meta content="2020-06-21T17:09:13+08:00" property="article:published_time"/>
-<meta content="2020-06-21T17:09:13+08:00" property="article:modified_time"/>
+<meta content="https://x5tar.com/about/" property="og:url"/><meta content="" property="article:section"/>
+<meta content="2021-05-31T15:42:39+08:00" property="article:published_time"/>
+<meta content="2021-05-31T15:42:39+08:00" property="article:modified_time"/>
 <meta content="summary" name="twitter:card"/>
-<meta content="Linux Cron 定时任务" name="twitter:title"/>
-<meta content="0x00 前言 在做一道涉及到 redis 未授权访问的题的时候，看到了使用到 /var/spool/cron/ 目录反弹 shell 后查询得知 Linux Cron 定时任务，在此记录下来 0x01 相关文件 与 Cron 相关的文件主要存在以下" name="twitter:description"/>
+<meta content="About 🌟" name="twitter:title"/>
+<meta content="自我介绍（迫真 某男子职业技术学院在读 CNSS / CTFer / WEB🐶 跟随大佬们脚步的菜鸡 业余代码搬运工 LOL 最强黑铁，0 / 21 / 0" name="twitter:description"/>
 <meta content="X5tar's Blog" name="application-name"/>
 <meta content="X5tar's Blog" name="apple-mobile-web-app-title"/><link href="/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
 <link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
-<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/><link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/><link href="/site.webmanifest" rel="manifest"/><link href="https://x5tar.com/posts/linux-crontab/" rel="canonical"/><link href="https://x5tar.com/posts/geekgame2020/" rel="prev"/><link href="https://x5tar.com/posts/redis-unauthorized-access/" rel="next"/><link href="/lib/normalize/normalize.min.css" rel="stylesheet"/><link href="/css/style.min.css" rel="stylesheet"/><link href="/lib/fontawesome-free/all.min.css" rel="stylesheet"/><link href="/lib/animate/animate.min.css" rel="stylesheet"/><script type="application/ld+json">
+<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/><link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/><link href="/site.webmanifest" rel="manifest"/><link href="https://x5tar.com/about/" rel="canonical"/><link href="https://x5tar.com/friends/" rel="next"/><link href="/lib/normalize/normalize.min.css" rel="stylesheet"/><link href="/css/style.min.css" rel="stylesheet"/><link href="/lib/fontawesome-free/all.min.css" rel="stylesheet"/><link href="/lib/animate/animate.min.css" rel="stylesheet"/><script type="application/ld+json">
     {
         "@context": "http://schema.org",
         "@type": "BlogPosting",
-        "headline": "Linux Cron 定时任务",
+        "headline": "About 🌟",
         "inLanguage": "zh-CN",
         "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": "https:\/\/x5tar.com\/posts\/linux-crontab\/"
-        },"genre": "posts","keywords": "Linux","wordcount":  728 ,
-        "url": "https:\/\/x5tar.com\/posts\/linux-crontab\/","datePublished": "2020-06-21T17:09:13+08:00","dateModified": "2020-06-21T17:09:13+08:00","publisher": {
+            "@id": "https:\/\/x5tar.com\/about\/"
+        },"genre": "page","wordcount":  54 ,
+        "url": "https:\/\/x5tar.com\/about\/","datePublished": "2021-05-31T15:42:39+08:00","dateModified": "2021-05-31T15:42:39+08:00","publisher": {
             "@type": "Organization",
             "name": "X5tar"},"author": {
                 "@type": "Person",
@@ -42,7 +42,7 @@
 <a href="/" title="X5tar's Blog">X5tar's Blog</a>
 </div>
 <div class="menu">
-<div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><a class="menu-item" href="/friends/"> Friends </a><a class="menu-item" href="/about/"> About </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+<div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><a class="menu-item" href="/friends/"> Friends </a><a class="menu-item active" href="/about/"> About </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
 <input id="search-input-desktop" placeholder="搜索文章标题或内容..." type="text"/>
 <a class="search-button search-toggle" href="javascript:void(0);" id="search-toggle-desktop" title="搜索">
 <i class="fas fa-search fa-fw"></i>
@@ -97,144 +97,34 @@
 <div id="search-dropdown-mobile"></div>
 </div>
 <main class="main">
-<div class="container"><div class="toc" id="toc-auto">
-<h2 class="toc-title">目录</h2>
-<div class="toc-content" id="toc-content-auto"></div>
-</div><article class="page single"><h1 class="single-title animated flipInX">Linux Cron 定时任务</h1><div class="post-meta">
-<div class="post-meta-line"><span class="post-author"><a class="author" href="/" rel="author" title="Author"><i class="fas fa-user-circle fa-fw"></i>X5tar</a></span> <span class="post-category">收录于 <a href="/categories/%E6%9D%82%E4%BA%8B/"><i class="far fa-folder fa-fw"></i>杂事</a></span></div>
-<div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i> <time datetime="2020-06-21">2020-06-21</time> <i class="fas fa-pencil-alt fa-fw"></i> 约 728 字 
-                <i class="far fa-clock fa-fw"></i> 预计阅读 2 分钟 </div>
-</div><div class="details toc" id="toc-static" kept="">
-<div class="details-summary toc-title">
-<span>目录</span>
-<span><i class="details-icon fas fa-angle-right"></i></span>
+<div class="container"><div class="page single special"><h1 class="single-title animated pulse faster">About 🌟</h1><div class="content" id="content"><div class="details admonition tip open">
+<div class="details-summary admonition-title">
+<i class="icon fas fa-lightbulb fa-fw"></i>自我介绍（迫真<i class="details-icon fas fa-angle-right fa-fw"></i>
 </div>
-<div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
-<ul>
-<li><a href="#0x00-前言">0x00 前言</a></li>
-<li><a href="#0x01-相关文件">0x01 相关文件</a></li>
-<li><a href="#0x02-crontab-命令操作">0x02 Crontab 命令操作</a></li>
-<li><a href="#0x03-配置文件内容">0x03 配置文件内容</a></li>
+<div class="details-content">
+<div class="admonition-content"><ul>
+<li>
+<p>某男子职业技术学院在读</p>
+</li>
+<li>
+<p><a href="https://cnss.io/" rel="noopener noreffer" target="_blank">CNSS</a> / CTFer / WEB🐶</p>
+</li>
+<li>
+<p>跟随大佬们脚步的菜鸡</p>
+</li>
+<li>
+<p>业余代码搬运工</p>
+</li>
+<li>
+<p>LOL 最强黑铁，0 / 21 / 0</p>
+</li>
 </ul>
-</nav></div>
-</div><div class="content" id="content"><h2 id="0x00-前言">0x00 前言</h2>
-<p>在做一道涉及到 redis 未授权访问的题的时候，看到了使用到 <code>/var/spool/cron/</code> 目录反弹 shell</p>
-<p>后查询得知 Linux Cron 定时任务，在此记录下来</p>
-<h2 id="0x01-相关文件">0x01 相关文件</h2>
-<p>与 Cron 相关的文件主要存在以下几个目录</p>
-<ul>
-<li><code>/var/spool/cron/</code> 目录下存放的是每个用户的 crontab 任务，每个任务以创建者的名字命名</li>
-<li><code>/etc/crontab</code> 这个文件负责调度各种管理和维护任务</li>
-<li><code>/etc/cron.d/</code> 这个目录用来存放任何要执行的 crontab 文件或脚本</li>
-<li>我们还可以把脚本放在<code>/etc/cron.hourly</code> 、 <code>/etc/cron.daily</code> 、 <code>/etc/cron.weekly</code> 、 <code>/etc/cron.monthly</code> 目录中，让它每小时/天/星期/月执行一次</li>
-</ul>
-<p>其中 <code>/var/spool/cron/</code> 为最常用的脚本存放位置，一般由 <code>crontab</code> 命令操作</p>
-<h2 id="0x02-crontab-命令操作">0x02 Crontab 命令操作</h2>
-<p>查看 <code>crontab</code> 命令的帮助如下</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">Usage:
- crontab [options] file
- crontab [options]
- crontab -n [hostname]
-
-Options:
- -u &lt;user&gt;  define user
- -e         edit user's crontab
- -l         list user's crontab
- -r         delete user's crontab
- -i         prompt before deleting
- -n &lt;host&gt;  set host in cluster to run users' crontabs
- -c         get host in cluster to run users' crontabs
- -V         print version and exit
- -x &lt;mask&gt;  enable debugging
-</code></pre></td></tr></table>
-</div>
-</div><p>其中常用的选项有 <code>-e</code> 、 <code>-l</code> 、 <code>-r</code></p>
-<ul>
-<li><code>-e</code> 用于编辑配置文件（即使用默认编辑器编辑 <code>/var/spool/cron/$USER</code> 文件）</li>
-<li><code>-l</code> 用于读取配置文件（即显示 <code>/var/spool/cron/$USER</code> 文件内容）</li>
-<li><code>-r</code> 用于删除配置文件（即删除 <code>/var/spool/cron/$USER</code> 文件）</li>
-</ul>
-<h2 id="0x03-配置文件内容">0x03 配置文件内容</h2>
-<p>做题过程中用到的文件为 <code>/var/spool/cron/root</code></p>
-<blockquote>
-<p><strong>注意：</strong></p>
-<p><code>/var/spool/cron/</code> 目录所有者为 root，权限为 755，只有 root 用户才能创建文件</p>
-<p>但 crontab 生成的配置文件所有者为创建的用户为创建用户，权限为 600</p>
-<p>所以只有在以 root 用户登录或当前登录用户已创建定时任务时才可直接修改该文件</p>
-</blockquote>
-<p>写入的内容为（其中 <code>command</code> 即为反弹 shell 的命令）</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">* * * * * command
-</code></pre></td></tr></table>
-</div>
-</div><p>该文件中一行命令由六部分组成，前五部分分别为 分、时、日、月、周，最后一部分为待执行的命令</p>
-<p>时间部分可用的操作符有</p>
-<ul>
-<li><code>*</code> 所有时间</li>
-<li><code>/</code> 时间间隔</li>
-<li><code>-</code> 时间范围</li>
-<li><code>,</code> 单独的时间</li>
-</ul>
-<p>所以上述写入内容为每隔一分钟执行一次 command，即可达到自动执行的目的</p>
-<p>另附几个上述操作符的使用示例</p>
-<ul>
-<li><code>*/10 8-16 * * * command</code> 每天的 8-16 时每 10 分钟执行一次</li>
-<li><code>0,30 * * * * command</code> 每小时的 0 分和 30 分各执行一次</li>
-<li><code>0 9 */2 * * command</code> 每隔两天的 9:00 执行一次</li>
-<li><code>0,20,40 8-16 * * 6,0 command</code> 每周六和周日的 8-16 时的 0 20 40 分各执行一次</li>
-</ul>
-</div><div class="post-footer" id="post-footer">
-<div class="post-info">
-<div class="post-info-line">
-<div class="post-info-mod">
-<span>更新于 2020-06-21</span>
-</div>
-<div class="post-info-license"></div>
-</div>
-<div class="post-info-line">
-<div class="post-info-md"><span>
-<a class="link-to-markdown" href="/posts/linux-crontab/index.md" target="_blank">阅读原始文档</a>
-</span></div>
-<div class="post-info-share">
-<span></span>
 </div>
 </div>
 </div>
-<div class="post-info-more">
-<section class="post-tags"><i class="fas fa-tags fa-fw"></i> <a href="/tags/linux/">Linux</a></section>
-<section>
-<span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span> | <span><a href="/">主页</a></span>
-</section>
-</div>
-<div class="post-nav"><a class="prev" href="/posts/geekgame2020/" rel="prev" title="GeekGame 2020 WEB 复现"><i class="fas fa-angle-left fa-fw"></i>GeekGame 2020 WEB 复现</a>
-<a class="next" href="/posts/redis-unauthorized-access/" rel="next" title="Redis 未授权访问">Redis 未授权访问<i class="fas fa-angle-right fa-fw"></i></a></div>
-</div>
-<div id="comments"><div class="comment" id="valine"></div><noscript>
+</div><div id="comments"><div class="comment" id="valine"></div><noscript>
                 Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
-            </noscript></div></article></div>
+            </noscript></div></div></div>
 </main><footer class="footer">
 <div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" rel="noopener noreffer" target="_blank" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" rel="noopener noreffer" target="_blank" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
 </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2021</span><span class="author" itemprop="copyrightHolder"> <a href="/" target="_blank">X5tar</a></span></div>

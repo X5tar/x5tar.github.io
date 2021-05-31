@@ -2,6 +2,8 @@
     xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     ><url>
+            <loc>https://x5tar.com/friends/</loc><lastmod>2021-05-31T15:42:45&#43;08:00</lastmod></url><url>
+            <loc>https://x5tar.com/about/</loc><lastmod>2021-05-31T15:42:39&#43;08:00</lastmod></url><url>
             <loc>https://x5tar.com/categories/</loc><lastmod>2020-06-23T21:12:30&#43;08:00</lastmod></url><url>
             <loc>https://x5tar.com/posts/</loc><lastmod>2020-06-23T21:12:30&#43;08:00</lastmod></url><url>
             <loc>https://x5tar.com/tags/redis/</loc><lastmod>2020-06-23T21:12:30&#43;08:00</lastmod></url><url>
