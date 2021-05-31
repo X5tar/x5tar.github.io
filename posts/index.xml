@@ -4,7 +4,14 @@
         <link>https://x5tar.com/posts/</link>
         <description>所有文章 | X5tar&#39;s Blog</description>
         <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>x5tar@qq.com (X5tar)</managingEditor>
-            <webMaster>x5tar@qq.com (X5tar)</webMaster><lastBuildDate>Tue, 23 Jun 2020 21:12:30 &#43;0800</lastBuildDate><atom:link href="https://x5tar.com/posts/" rel="self" type="application/rss+xml" /><item>
+            <webMaster>x5tar@qq.com (X5tar)</webMaster><lastBuildDate>Mon, 31 May 2021 21:57:01 &#43;0800</lastBuildDate><atom:link href="https://x5tar.com/posts/" rel="self" type="application/rss+xml" /><item>
+    <title>博客迁移记</title>
+    <link>https://x5tar.com/posts/blog-migration/</link>
+    <pubDate>Mon, 31 May 2021 21:57:01 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://x5tar.com/posts/blog-migration/</guid>
+    <description><![CDATA[前几天猛然发现自己的博客已经好多天没更新了，翻了一圈发现博客源码也被我弄丢了，由于不想再配一遍 Hexo 和依赖的各种库（其实就是懒，索性直接把博客迁]]></description>
+</item><item>
     <title>Redis 未授权访问</title>
     <link>https://x5tar.com/posts/redis-unauthorized-access/</link>
     <pubDate>Tue, 23 Jun 2020 21:12:30 &#43;0800</pubDate>
@@ -67,12 +74,5 @@
     <author>作者</author>
     <guid>https://x5tar.com/posts/flask-debug-pin/</guid>
     <description><![CDATA[0x00 前言 上周打南邮的 NCTF 时碰到了一道名为 flask_website 的题，刚开始想的是模板注入，但发现没有注入点，后来点到页面最下边的一个链接，跳转到了 Debug 模式的报错界面，]]></description>
-</item><item>
-    <title>CNSS Recruit 2019 Web Boss题 WriteUp</title>
-    <link>https://x5tar.com/posts/cnss-recruit-2019-web-boss/</link>
-    <pubDate>Thu, 24 Oct 2019 23:18:36 &#43;0800</pubDate>
-    <author>作者</author>
-    <guid>https://x5tar.com/posts/cnss-recruit-2019-web-boss/</guid>
-    <description><![CDATA[0x00 吐槽思考 for [BOSS] Get Me Inside 这道题肝的是真的爽，从 ddl 前一天晚上开始，搞到 ddl 当天凌晨四点多~~（原来我的肝这么好）~~ 这是一道涉及面广泛的题，考虑到了]]></description>
 </item></channel>
 </rss>
