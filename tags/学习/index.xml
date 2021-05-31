@@ -1,0 +1,22 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>学习 - 标签 - X5tar&#39;s Blog</title>
+        <link>https://x5tar.com/tags/%E5%AD%A6%E4%B9%A0/</link>
+        <description>学习 - 标签 - X5tar&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>x5tar@qq.com (X5tar)</managingEditor>
+            <webMaster>x5tar@qq.com (X5tar)</webMaster><lastBuildDate>Wed, 19 Feb 2020 17:10:16 &#43;0800</lastBuildDate><atom:link href="https://x5tar.com/tags/%E5%AD%A6%E4%B9%A0/" rel="self" type="application/rss+xml" /><item>
+    <title>Git 学习笔记</title>
+    <link>https://x5tar.com/posts/learn-git/</link>
+    <pubDate>Wed, 19 Feb 2020 17:10:16 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://x5tar.com/posts/learn-git/</guid>
+    <description><![CDATA[〇、获取本地仓库 git init 初始化仓库 git clone &lt;url&gt; 从远程仓库克隆（url 可采用 git、http、https 和 ssh 等协议） 一、本地文件修改、提交及查看等 git status 查]]></description>
+</item><item>
+    <title>关于 Flask Debug PIN 的安全性问题</title>
+    <link>https://x5tar.com/posts/flask-debug-pin/</link>
+    <pubDate>Tue, 26 Nov 2019 19:03:51 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://x5tar.com/posts/flask-debug-pin/</guid>
+    <description><![CDATA[0x00 前言 上周打南邮的 NCTF 时碰到了一道名为 flask_website 的题，刚开始想的是模板注入，但发现没有注入点，后来点到页面最下边的一个链接，跳转到了 Debug 模式的报错界面，]]></description>
+</item></channel>
+</rss>

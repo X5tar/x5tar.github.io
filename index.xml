@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<title>X5tar's Blog</title>
+<link>https://x5tar.com/</link>
+<description>X5tar's Blog</description>
+<generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>x5tar@qq.com (X5tar)</managingEditor>
+<webMaster>x5tar@qq.com (X5tar)</webMaster><lastBuildDate>Tue, 23 Jun 2020 21:12:30 +0800</lastBuildDate>
+<atom:link href="https://x5tar.com/index.xml" rel="self" type="application/rss+xml"/>
+<item>
+<title>Redis 未授权访问</title>
+<link>https://x5tar.com/posts/redis-unauthorized-access/</link>
+<pubDate>Tue, 23 Jun 2020 21:12:30 +0800</pubDate>
+<author>作者</author>
+<guid>https://x5tar.com/posts/redis-unauthorized-access/</guid>
+<description>0x00 前言 刷题时遇到了涉及到 Redis 未授权访问的题，发现自己不会，故总结一下 Redis 未授权访问的利用方法 0x01 Redis 介绍 Redis 是一个使用 ANSI C 编写的开源、支持网络、基于内</description>
+</item><item>
+<title>Linux Cron 定时任务</title>
+<link>https://x5tar.com/posts/linux-crontab/</link>
+<pubDate>Sun, 21 Jun 2020 17:09:13 +0800</pubDate>
+<author>作者</author>
+<guid>https://x5tar.com/posts/linux-crontab/</guid>
+<description>0x00 前言 在做一道涉及到 redis 未授权访问的题的时候，看到了使用到 /var/spool/cron/ 目录反弹 shell 后查询得知 Linux Cron 定时任务，在此记录下来 0x01 相关文件 与 Cron 相关的文件主要存在以下</description>
+</item><item>
+<title>GeekGame 2020 WEB 复现</title>
+<link>https://x5tar.com/posts/geekgame2020/</link>
+<pubDate>Wed, 27 May 2020 16:57:49 +0800</pubDate>
+<author>作者</author>
+<guid>https://x5tar.com/posts/geekgame2020/</guid>
+<description>前言 被川大的同学叫来打这个比赛 嗯没错这次比赛非常神奇，水出来的 RE 和 Crypto 都比 WEB 多&amp;hellip; 比赛的时候就做出来一道 WEB（真的菜 二次注入 真的</description>
+</item><item>
+<title>Linux 中的 source 命令（点命令）</title>
+<link>https://x5tar.com/posts/source-command/</link>
+<pubDate>Sun, 10 May 2020 10:26:57 +0800</pubDate>
+<author>作者</author>
+<guid>https://x5tar.com/posts/source-command/</guid>
+<description>在做题的时候遇到了上传了 shell 脚本但是没有执行权限的情况 测试脚本 测试脚本shell " 测试脚本 本地测试结果 没有执行权限denied " 没有执行权限 然</description>
+</item><item>
+<title>PHP 中不包含字母和数字的 webshell</title>
+<link>https://x5tar.com/posts/php-webshell-without-alpha-and-num/</link>
+<pubDate>Sun, 03 May 2020 20:47:41 +0800</pubDate>
+<author>作者</author>
+<guid>https://x5tar.com/posts/php-webshell-without-alpha-and-num/</guid>
+<description>0x00 前言 又是好多天没写博客了，就想着再来随便水点什么吧 这种神奇的题曾经在 CNSS Recruit 2019 Web Boss题 中出现过，最近做题又遇到了一次结果还是不会（因为又多</description>
+</item><item>
+<title>虎符 CTF WEB 部分复现</title>
+<link>https://x5tar.com/posts/hfctf-web/</link>
+<pubDate>Wed, 22 Apr 2020 15:17:37 +0800</pubDate>
+<author>作者</author>
+<guid>https://x5tar.com/posts/hfctf-web/</guid>
+<description>0x00 前言 当时比赛的时候，一共三道 WEB 题，两道 nodejs 的都不会，还有一道 PHP 没来得及看后来看了也不会（还是太菜了 趁题还热乎，借着 dalao 们的 WP 复现一波 0x01 easy_login 由于静</description>
+</item><item>
+<title>绕过字符数限制 getshell</title>
+<link>https://x5tar.com/posts/bypass-char-number-limit/</link>
+<pubDate>Sat, 18 Apr 2020 12:56:22 +0800</pubDate>
+<author>作者</author>
+<guid>https://x5tar.com/posts/bypass-char-number-limit/</guid>
+<description>0x00 前言 之前做题有做到过字数限制的 shell，有五个字符也有四个字符的，当然我一直不会做，最近又重新研究了一下这个绕过的问题，就把它记录下来了</description>
+</item><item>
+<title>Git 学习笔记</title>
+<link>https://x5tar.com/posts/learn-git/</link>
+<pubDate>Wed, 19 Feb 2020 17:10:16 +0800</pubDate>
+<author>作者</author>
+<guid>https://x5tar.com/posts/learn-git/</guid>
+<description>〇、获取本地仓库 git init 初始化仓库 git clone &amp;lt;url&amp;gt; 从远程仓库克隆（url 可采用 git、http、https 和 ssh 等协议） 一、本地文件修改、提交及查看等 git status 查</description>
+</item><item>
+<title>关于 Flask Debug PIN 的安全性问题</title>
+<link>https://x5tar.com/posts/flask-debug-pin/</link>
+<pubDate>Tue, 26 Nov 2019 19:03:51 +0800</pubDate>
+<author>作者</author>
+<guid>https://x5tar.com/posts/flask-debug-pin/</guid>
+<description>0x00 前言 上周打南邮的 NCTF 时碰到了一道名为 flask_website 的题，刚开始想的是模板注入，但发现没有注入点，后来点到页面最下边的一个链接，跳转到了 Debug 模式的报错界面，</description>
+</item><item>
+<title>CNSS Recruit 2019 Web Boss题 WriteUp</title>
+<link>https://x5tar.com/posts/cnss-recruit-2019-web-boss/</link>
+<pubDate>Thu, 24 Oct 2019 23:18:36 +0800</pubDate>
+<author>作者</author>
+<guid>https://x5tar.com/posts/cnss-recruit-2019-web-boss/</guid>
+<description>0x00 吐槽思考 for [BOSS] Get Me Inside 这道题肝的是真的爽，从 ddl 前一天晚上开始，搞到 ddl 当天凌晨四点多~~（原来我的肝这么好）~~ 这是一道涉及面广泛的题，考虑到了</description>
+</item></channel>
+</rss>

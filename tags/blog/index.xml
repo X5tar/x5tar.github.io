@@ -1,0 +1,15 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Blog - 标签 - X5tar&#39;s Blog</title>
+        <link>https://x5tar.com/tags/blog/</link>
+        <description>Blog - 标签 - X5tar&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>x5tar@qq.com (X5tar)</managingEditor>
+            <webMaster>x5tar@qq.com (X5tar)</webMaster><lastBuildDate>Wed, 23 Oct 2019 09:24:52 &#43;0800</lastBuildDate><atom:link href="https://x5tar.com/tags/blog/" rel="self" type="application/rss+xml" /><item>
+    <title>博客搭建血泪史</title>
+    <link>https://x5tar.com/posts/build-my-blog/</link>
+    <pubDate>Wed, 23 Oct 2019 09:24:52 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://x5tar.com/posts/build-my-blog/</guid>
+    <description><![CDATA[0x00 前言 前几天心血来潮想搭个博客，可万万没想到，搭个博客如此令人愉(beng)悦(kui)，来让我们从头说起😭 0x01 Where？ 搭建博客一般有两种]]></description>
+</item></channel>
+</rss>
