@@ -1,0 +1,29 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>随便学学 - 分类 - X5tar&#39;s Blog</title>
+        <link>https://x5tar.com/categories/%E9%9A%8F%E4%BE%BF%E5%AD%A6%E5%AD%A6/</link>
+        <description>随便学学 - 分类 - X5tar&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>x5tar@qq.com (X5tar)</managingEditor>
+            <webMaster>x5tar@qq.com (X5tar)</webMaster><lastBuildDate>Sun, 21 Jun 2020 17:09:13 &#43;0800</lastBuildDate><atom:link href="https://x5tar.com/categories/%E9%9A%8F%E4%BE%BF%E5%AD%A6%E5%AD%A6/" rel="self" type="application/rss+xml" /><item>
+    <title>Linux Cron 定时任务</title>
+    <link>https://x5tar.com/posts/linux-crontab/</link>
+    <pubDate>Sun, 21 Jun 2020 17:09:13 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://x5tar.com/posts/linux-crontab/</guid>
+    <description><![CDATA[0x00 前言 在做一道涉及到 redis 未授权访问的题的时候，看到了使用到 /var/spool/cron/ 目录反弹 shell 后查询得知 Linux Cron 定时任务，在此记录下来 0x01 相关文件 与 Cron 相关的文件主要存在以下]]></description>
+</item><item>
+    <title>Linux 中的 source 命令（点命令）</title>
+    <link>https://x5tar.com/posts/source-command/</link>
+    <pubDate>Sun, 10 May 2020 10:26:57 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://x5tar.com/posts/source-command/</guid>
+    <description><![CDATA[在做题的时候遇到了上传了 shell 脚本但是没有执行权限的情况 测试脚本 测试脚本shell " 测试脚本 本地测试结果 没有执行权限denied " 没有执行权限 然]]></description>
+</item><item>
+    <title>Git 学习笔记</title>
+    <link>https://x5tar.com/posts/learn-git/</link>
+    <pubDate>Wed, 19 Feb 2020 17:10:16 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://x5tar.com/posts/learn-git/</guid>
+    <description><![CDATA[〇、获取本地仓库 git init 初始化仓库 git clone &lt;url&gt; 从远程仓库克隆（url 可采用 git、http、https 和 ssh 等协议） 一、本地文件修改、提交及查看等 git status 查]]></description>
+</item></channel>
+</rss>

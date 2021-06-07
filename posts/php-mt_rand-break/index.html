@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="noodp" name="robots"/>
+<meta content="IE=edge, chrome=1" http-equiv="X-UA-Compatible"/>
+<title>还原 PHP mt_rand 种子 - X5tar's Blog</title><meta content="" name="Description"/><meta content="还原 PHP mt_rand 种子" property="og:title"/>
+<meta content="0x00 前言 今年国赛分区赛遇到一个还原 PHP mt_rand 种子的题（由于太菜了 break 的时候根本没有做到这一步 这一部分的源码是这样的 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18" property="og:description"/>
+<meta content="article" property="og:type"/>
+<meta content="https://x5tar.com/posts/php-mt_rand-break/" property="og:url"/><meta content="https://x5tar.com/posts/php-mt_rand-break/seed-recovery.png" property="og:image"/><meta content="posts" property="article:section"/>
+<meta content="2021-06-07T19:30:03+08:00" property="article:published_time"/>
+<meta content="2021-06-07T19:30:03+08:00" property="article:modified_time"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="https://x5tar.com/posts/php-mt_rand-break/seed-recovery.png" name="twitter:image"/>
+<meta content="还原 PHP mt_rand 种子" name="twitter:title"/>
+<meta content="0x00 前言 今年国赛分区赛遇到一个还原 PHP mt_rand 种子的题（由于太菜了 break 的时候根本没有做到这一步 这一部分的源码是这样的 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18" name="twitter:description"/>
+<meta content="X5tar's Blog" name="application-name"/>
+<meta content="X5tar's Blog" name="apple-mobile-web-app-title"/><link href="/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/><link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/><link href="/site.webmanifest" rel="manifest"/><link href="https://x5tar.com/posts/php-mt_rand-break/" rel="canonical"/><link href="https://x5tar.com/posts/blog-migration/" rel="prev"/><link href="/lib/normalize/normalize.min.css" rel="stylesheet"/><link href="/css/style.min.css" rel="stylesheet"/><link href="/lib/fontawesome-free/all.min.css" rel="stylesheet"/><link href="/lib/animate/animate.min.css" rel="stylesheet"/><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "还原 PHP mt_rand 种子",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/x5tar.com\/posts\/php-mt_rand-break\/"
+        },"genre": "posts","keywords": "PHP, mt_rand","wordcount":  3037 ,
+        "url": "https:\/\/x5tar.com\/posts\/php-mt_rand-break\/","datePublished": "2021-06-07T19:30:03+08:00","dateModified": "2021-06-07T19:30:03+08:00","publisher": {
+            "@type": "Organization",
+            "name": "X5tar"},"author": {
+                "@type": "Person",
+                "name": "X5tar"
+            },"description": ""
+    }
+    </script></head>
+<body header-desktop="" header-mobile=""><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : '' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+<div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu">
+<div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><a class="menu-item" href="/friends/"> Friends </a><a class="menu-item" href="/about/"> About </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+<input id="search-input-desktop" placeholder="搜索文章标题或内容..." type="text"/>
+<a class="search-button search-toggle" href="javascript:void(0);" id="search-toggle-desktop" title="搜索">
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a class="search-button search-clear" href="javascript:void(0);" id="search-clear-desktop" title="清空">
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id="search-loading-desktop">
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</span><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a>
+</div>
+</div>
+</div>
+</header><header class="mobile" id="header-mobile">
+<div class="header-container">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu-toggle" id="menu-toggle-mobile">
+<span></span><span></span><span></span>
+</div>
+</div>
+<div class="menu" id="menu-mobile"><div class="search-wrapper">
+<div class="search mobile" id="search-mobile">
+<input id="search-input-mobile" placeholder="搜索文章标题或内容..." type="text"/>
+<a class="search-button search-toggle" href="javascript:void(0);" id="search-toggle-mobile" title="搜索">
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a class="search-button search-clear" href="javascript:void(0);" id="search-clear-mobile" title="清空">
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id="search-loading-mobile">
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</div>
+<a class="search-cancel" href="javascript:void(0);" id="search-cancel-mobile">
+                        取消
+                    </a>
+</div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/categories/" title="">Categories</a><a class="menu-item" href="/friends/" title="">Friends</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a></div>
+</div>
+</header>
+<div class="search-dropdown desktop">
+<div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+<div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+<div class="container"><div class="toc" id="toc-auto">
+<h2 class="toc-title">目录</h2>
+<div class="toc-content" id="toc-content-auto"></div>
+</div><article class="page single"><h1 class="single-title animated flipInX">还原 PHP mt_rand 种子</h1><div class="post-meta">
+<div class="post-meta-line"><span class="post-author"><a class="author" href="/" rel="author" title="Author"><i class="fas fa-user-circle fa-fw"></i>X5tar</a></span> <span class="post-category">收录于 <a href="/categories/security/"><i class="far fa-folder fa-fw"></i>Security</a></span></div>
+<div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i> <time datetime="2021-06-07">2021-06-07</time> <i class="fas fa-pencil-alt fa-fw"></i> 约 3037 字 
+                <i class="far fa-clock fa-fw"></i> 预计阅读 7 分钟 </div>
+</div><div class="details toc" id="toc-static" kept="">
+<div class="details-summary toc-title">
+<span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span>
+</div>
+<div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+<ul>
+<li><a href="#0x00-前言">0x00 前言</a></li>
+<li><a href="#0x01-从源码开始">0x01 从源码开始</a></li>
+<li><a href="#0x02-从后往前看">0x02 从后往前看</a>
+<ul>
+<li><a href="#mt_rand">mt_rand</a></li>
+<li><a href="#php_mt_rand">php_mt_rand</a></li>
+<li><a href="#php_mt_reload">php_mt_reload</a></li>
+<li><a href="#php_mt_initialize">php_mt_initialize</a></li>
+</ul>
+</li>
+<li><a href="#0x03-逆操作综合">0x03 逆操作综合</a></li>
+<li><a href="#0x04-测试">0x04 测试</a></li>
+<li><a href="#0x05-后记">0x05 后记</a></li>
+</ul>
+</nav></div>
+</div><div class="content" id="content"><h2 id="0x00-前言">0x00 前言</h2>
+<p>今年国赛分区赛遇到一个还原 PHP mt_rand 种子的题（由于太菜了 break 的时候根本没有做到这一步</p>
+<p>这一部分的源码是这样的</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-php" data-lang="php"><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nx">scandir</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span> <span class="k">as</span> <span class="nv">$i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">strlen</span><span class="p">(</span><span class="nv">$i</span><span class="p">)</span> <span class="o">===</span> <span class="mi">36</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">include</span> <span class="nv">$i</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'pass'</span><span class="p">]))</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$style3</span><span class="o">.</span><span class="s2">"需要登录&lt;/br&gt;</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+    <span class="k">die</span><span class="p">(</span><span class="nv">$form</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">'pass'</span><span class="p">]</span> <span class="o">!==</span> <span class="s1">'nya_nop_nya~'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$style3</span><span class="o">.</span><span class="s2">"密码错误. 为什么不回去看看呢?&lt;/br&gt;</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+    <span class="k">die</span><span class="p">(</span><span class="nv">$form</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">echo</span> <span class="nv">$style2</span><span class="p">;</span>
+<span class="nx">mt_srand</span><span class="p">(</span><span class="nx">rand</span><span class="p">(</span><span class="mi">10000000</span><span class="p">,</span> <span class="mi">99999999</span><span class="p">));</span>
+<span class="k">echo</span> <span class="s2">"&lt;nya&gt;你要的flag!&lt;/br&gt;</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+<span class="k">echo</span> <span class="nx">openssl_encrypt</span><span class="p">(</span><span class="nv">$flag</span><span class="p">,</span> <span class="s1">'aes-256-cfb'</span><span class="p">,</span> <span class="nx">mt_rand</span><span class="p">(),</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">mt_rand</span><span class="p">());</span>
+<span class="k">echo</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">&lt;/br&gt;看不懂?不如来抽卡吧!&lt;/br&gt;</span><span class="se">\n</span><span class="s2">"</span> <span class="o">.</span> <span class="nv">$form2</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'roll'</span><span class="p">];</span> <span class="nv">$i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nx">mt_rand</span><span class="p">()</span> <span class="o">.</span> <span class="s2">" "</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">echo</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">&lt;/nya&gt;"</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>通过后续产生的随机数还原出随机数种子，然后得到加密的密钥和 IV</p>
+<p>这里有两种攻击思路：第一种就是爆破，反正种子就 8 位整数，爆破就是费点时间；第二种就是通过 mt_rand 的规律还原种子</p>
+<p>之前看到过大佬写的不用爆破还原随机数种子的文章：<a href="https://www.ambionics.io/blog/php-mt-rand-prediction" rel="noopener noreffer" target="_blank">BREAKING PHP’S MT_RAND() WITH 2 VALUES AND NO BRUTEFORCE</a>，这里跟着大佬的思路自己分析一下</p>
+<h2 id="0x01-从源码开始">0x01 从源码开始</h2>
+<p><code>mt_rand</code> 相关的函数在 <code>ext/stadard/mt_rand.c</code> 中，其中 <code>mt_rand</code> 对应的函数如下</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;mt_rand 函数&lt;/h2&gt;&lt;p&gt;mt_rand&lt;/p&gt;" data-thumbnail="/posts/php-mt_rand-break/mt_rand.png" href="/posts/php-mt_rand-break/mt_rand.png" title="mt_rand">
+<img alt="/posts/php-mt_rand-break/mt_rand.png" class="lazyload" data-sizes="auto" data-src="mt_rand.png" data-srcset="/posts/php-mt_rand-break/mt_rand.png, mt_rand.png 1.5x, /posts/php-mt_rand-break/mt_rand.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">mt_rand 函数</figcaption>
+</figure></p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;php_mt_rand 函数&lt;/h2&gt;&lt;p&gt;php_mt_rand&lt;/p&gt;" data-thumbnail="/posts/php-mt_rand-break/php_mt_rand.png" href="/posts/php-mt_rand-break/php_mt_rand.png" title="php_mt_rand">
+<img alt="/posts/php-mt_rand-break/php_mt_rand.png" class="lazyload" data-sizes="auto" data-src="php_mt_rand.png" data-srcset="/posts/php-mt_rand-break/php_mt_rand.png, php_mt_rand.png 1.5x, /posts/php-mt_rand-break/php_mt_rand.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">php_mt_rand 函数</figcaption>
+</figure></p>
+<p>其中 BG 宏的定义在 <code>ext/standard/mt_rand.c</code> 中，大概就是获取类似全局变量的东西</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;BG 宏定义&lt;/h2&gt;&lt;p&gt;BG&lt;/p&gt;" data-thumbnail="/posts/php-mt_rand-break/BG.png" href="/posts/php-mt_rand-break/BG.png" title="BG">
+<img alt="/posts/php-mt_rand-break/BG.png" class="lazyload" data-sizes="auto" data-src="BG.png" data-srcset="/posts/php-mt_rand-break/BG.png, BG.png 1.5x, /posts/php-mt_rand-break/BG.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">BG 宏定义</figcaption>
+</figure></p>
+<p>用于设置随机数种子的 <code>php_mt_srand</code> 的源码如下</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;php_mt_srand 函数&lt;/h2&gt;&lt;p&gt;php_mt_srand&lt;/p&gt;" data-thumbnail="/posts/php-mt_rand-break/php_mt_srand.png" href="/posts/php-mt_rand-break/php_mt_srand.png" title="php_mt_srand">
+<img alt="/posts/php-mt_rand-break/php_mt_srand.png" class="lazyload" data-sizes="auto" data-src="php_mt_srand.png" data-srcset="/posts/php-mt_rand-break/php_mt_srand.png, php_mt_srand.png 1.5x, /posts/php-mt_rand-break/php_mt_srand.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">php_mt_srand 函数</figcaption>
+</figure></p>
+<p>其中 <code>state</code> 变量为初始化后的状态向量，储存产生的随机数</p>
+<p><code>php_mt_initialize</code> 和 <code>php_mt_reload</code> 的源码如下</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;php_mt_initialize&lt;/h2&gt;&lt;p&gt;php_mt_initialize&lt;/p&gt;" data-thumbnail="/posts/php-mt_rand-break/php_mt_initialize.png" href="/posts/php-mt_rand-break/php_mt_initialize.png" title="php_mt_initialize">
+<img alt="/posts/php-mt_rand-break/php_mt_initialize.png" class="lazyload" data-sizes="auto" data-src="php_mt_initialize.png" data-srcset="/posts/php-mt_rand-break/php_mt_initialize.png, php_mt_initialize.png 1.5x, /posts/php-mt_rand-break/php_mt_initialize.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">php_mt_initialize</figcaption>
+</figure></p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;php_mt_reload 函数&lt;/h2&gt;&lt;p&gt;php_mt_reload&lt;/p&gt;" data-thumbnail="/posts/php-mt_rand-break/php_mt_reload.png" href="/posts/php-mt_rand-break/php_mt_reload.png" title="php_mt_reload">
+<img alt="/posts/php-mt_rand-break/php_mt_reload.png" class="lazyload" data-sizes="auto" data-src="php_mt_reload.png" data-srcset="/posts/php-mt_rand-break/php_mt_reload.png, php_mt_reload.png 1.5x, /posts/php-mt_rand-break/php_mt_reload.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">php_mt_reload 函数</figcaption>
+</figure></p>
+<p>其中 MT_RAND_MT19937 定义在 <code>ext/standard/php_mt_rand.h</code> 中</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;MT_RAND_MT19937&lt;/h2&gt;&lt;p&gt;MT_RAND_MT19937&lt;/p&gt;" data-thumbnail="/posts/php-mt_rand-break/MT_RAND_MT19937.png" href="/posts/php-mt_rand-break/MT_RAND_MT19937.png" title="MT_RAND_MT19937">
+<img alt="/posts/php-mt_rand-break/MT_RAND_MT19937.png" class="lazyload" data-sizes="auto" data-src="MT_RAND_MT19937.png" data-srcset="/posts/php-mt_rand-break/MT_RAND_MT19937.png, MT_RAND_MT19937.png 1.5x, /posts/php-mt_rand-break/MT_RAND_MT19937.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">MT_RAND_MT19937</figcaption>
+</figure></p>
+<p>选择模式的操作在 <code>mt_srand</code> 函数中，默认为 MT19937 模式使用 <code>twist</code> 宏，若选择 1 则为 PHP 模式使用 <code>twist_php</code> 宏</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;mt_srand 函数&lt;/h2&gt;&lt;p&gt;mt_srand&lt;/p&gt;" data-thumbnail="/posts/php-mt_rand-break/mt_srand.png" href="/posts/php-mt_rand-break/mt_srand.png" title="mt_srand">
+<img alt="/posts/php-mt_rand-break/mt_srand.png" class="lazyload" data-sizes="auto" data-src="mt_srand.png" data-srcset="/posts/php-mt_rand-break/mt_srand.png, mt_srand.png 1.5x, /posts/php-mt_rand-break/mt_srand.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">mt_srand 函数</figcaption>
+</figure></p>
+<p>其中一些全局变量和宏的定义如下</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;全局变量和宏&lt;/h2&gt;&lt;p&gt;macros and global variables&lt;/p&gt;" data-thumbnail="/posts/php-mt_rand-break/macros-and-global-variables.png" href="/posts/php-mt_rand-break/macros-and-global-variables.png" title="macros and global variables">
+<img alt="/posts/php-mt_rand-break/macros-and-global-variables.png" class="lazyload" data-sizes="auto" data-src="macros-and-global-variables.png" data-srcset="/posts/php-mt_rand-break/macros-and-global-variables.png, macros-and-global-variables.png 1.5x, /posts/php-mt_rand-break/macros-and-global-variables.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">全局变量和宏</figcaption>
+</figure></p>
+<p><code>MT_N</code> 定义在 <code>ext/standard/basic_functions.h</code> 中，为初始化产生的状态向量的长度</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;MT_N&lt;/h2&gt;&lt;p&gt;MT_N&lt;/p&gt;" data-thumbnail="/posts/php-mt_rand-break/MT_N.png" href="/posts/php-mt_rand-break/MT_N.png" title="MT_N">
+<img alt="/posts/php-mt_rand-break/MT_N.png" class="lazyload" data-sizes="auto" data-src="MT_N.png" data-srcset="/posts/php-mt_rand-break/MT_N.png, MT_N.png 1.5x, /posts/php-mt_rand-break/MT_N.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">MT_N</figcaption>
+</figure></p>
+<p><code>php_mt_initialize</code> 函数的作用很简单，产生初始的状态向量，每个值都由它前一个值生成，第一个值为输入的种子</p>
+<p><code>php_mt_reload</code> 函数对初始状态向量进行混合，产生 N 个新的值作为被 mt_rand 使用的随机数</p>
+<p><code>php_mt_rand</code> 函数再对这些值进行简单的处理生成最终的随机数</p>
+<h2 id="0x02-从后往前看">0x02 从后往前看</h2>
+<h3 id="mt_rand">mt_rand</h3>
+<p>首先从被调用的 <code>mt_rand</code> 开始分析，<code>mt_rand</code> 返回的随机数为 <code>php_mt_rand</code> 返回值右移一位</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">RETURN_LONG</span><span class="p">(</span><span class="n">php_mt_rand</span><span class="p">()</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>由于右移后其最低位丢失，故一个输出的随机数对应两种可能的 <code>php_mt_rand</code> 返回值，其最低位分别为 0 和 1</p>
+<h3 id="php_mt_rand">php_mt_rand</h3>
+<p><code>php_mt_rand</code> 返回值为经过处理的 <code>php_mt_reload</code> 中产生的值，其中进行处理的代码如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">s1</span> <span class="o">^=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&gt;&gt;</span> <span class="mi">11</span><span class="p">);</span>
+<span class="n">s1</span> <span class="o">^=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&lt;&lt;</span>  <span class="mi">7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x9d2c5680U</span><span class="p">;</span>
+<span class="n">s1</span> <span class="o">^=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">15</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xefc60000U</span><span class="p">;</span>
+<span class="k">return</span> <span class="p">(</span> <span class="n">s1</span> <span class="o">^</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&gt;&gt;</span> <span class="mi">18</span><span class="p">)</span> <span class="p">);</span> <span class="c1">// s1 ^= (s1 &gt;&gt; 18);
+</span></code></pre></td></tr></table>
+</div>
+</div><p>这四条代码均为可逆操作</p>
+<ul>
+<li>
+<p><code>s1 ^= (s1 &gt;&gt; 11)</code></p>
+<p>结果高 11 位与原值高 11 位相同，结果低 21 位为原值高 21 位与低 21 位异或结果</p>
+<p>故其逆操作如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">s1</span> <span class="o">^=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&gt;&gt;</span> <span class="mi">11</span><span class="p">);</span> <span class="c1">// 恢复 10~20 位
+</span><span class="c1"></span><span class="n">s1</span> <span class="o">^=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&gt;&gt;</span> <span class="mi">22</span><span class="p">);</span> <span class="c1">// 恢复 0~9 位 (低 10 位)
+</span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p><code>s1 ^= (s1 &lt;&lt;  7) &amp; 0x9d2c5680U</code></p>
+<p>其逆操作如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">s2</span> <span class="o">=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">21</span><span class="p">)</span> <span class="o">^</span> <span class="p">(((</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x9d2c5680U</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">21</span><span class="p">);</span> <span class="c1">// 恢复高 11 位
+</span><span class="c1"></span><span class="n">s2</span> <span class="o">=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">14</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">s2</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x9d2c5680U</span> <span class="o">&lt;&lt;</span> <span class="mi">14</span><span class="p">));</span> <span class="c1">// 恢复 14~20 位
+</span><span class="c1"></span><span class="n">s2</span> <span class="o">=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">s2</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x9d2c5680U</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">));</span> <span class="c1">// 恢复 7~13 位
+</span><span class="c1"></span><span class="n">s1</span> <span class="o">^=</span> <span class="n">s2</span> <span class="o">&amp;</span> <span class="mh">0x9d2c5680U</span><span class="p">;</span> <span class="c1">// 恢复低 7 位
+</span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p><code>s1 ^= (s1 &lt;&lt; 15) &amp; 0xefc60000U</code></p>
+<p>结果高 16 位为原值 1~16 位与 <code>0xefc6</code> 相与并与原值高 16 位异或的结果，低 16 位与原值低 16 位相同</p>
+<p>故其逆操作与原操作相同</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">s1</span> <span class="o">^=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">15</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xefc60000U</span><span class="p">;</span> <span class="c1">// 恢复高 16 位
+</span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p><code>s1 ^= (s1 &gt;&gt; 18)</code></p>
+<p>结果高 18 位与原值高 18 位相同，结果低 14 位为原值高 14 位与低 14 位异或结果</p>
+<p>故其逆操作与原操作相同</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">s1</span> <span class="o">^=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&gt;&gt;</span> <span class="mi">18</span><span class="p">);</span> <span class="c1">// 恢复低 14 位
+</span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p>结合以上四步得到 <code>php_mt_rand</code> 中处理操作的逆操作</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">uint32_t</span> <span class="nf">reverse_php_mt_rand</span><span class="p">(</span><span class="n">uint32_t</span> <span class="n">s1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">s1</span> <span class="o">^=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&gt;&gt;</span> <span class="mi">18</span><span class="p">);</span>
+    
+    <span class="n">s1</span> <span class="o">^=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">15</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xefc60000U</span><span class="p">;</span>
+    
+    <span class="n">s2</span> <span class="o">=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">21</span><span class="p">)</span> <span class="o">^</span> <span class="p">(((</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x9d2c5680U</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">21</span><span class="p">);</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">14</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">s2</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x9d2c5680U</span> <span class="o">&lt;&lt;</span> <span class="mi">14</span><span class="p">));</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">s2</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x9d2c5680U</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">));</span>
+    <span class="n">s1</span> <span class="o">^=</span> <span class="n">s2</span> <span class="o">&amp;</span> <span class="mh">0x9d2c5680U</span><span class="p">;</span>
+    
+    <span class="n">s1</span> <span class="o">^=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&gt;&gt;</span> <span class="mi">11</span><span class="p">);</span>
+    <span class="n">s1</span> <span class="o">^=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&gt;&gt;</span> <span class="mi">22</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">s1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="php_mt_reload">php_mt_reload</h3>
+<p>代码中的循环分为两部分，输出状态向量中前 N-M (227) 个值与后 M (397) 个值的产生方法不同</p>
+<p>且对于后 M (397) 个值，<code>state_reload[i]</code> 与 <code>state_reload[i-227]</code> 存在一定的关联，即</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">state_reload</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">twist</span><span class="p">(</span><span class="n">state_reload</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">227</span><span class="p">],</span> <span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>其中用到的宏如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#define hiBit(u)      ((u) &amp; 0x80000000U)  </span><span class="cm">/* mask all but highest   bit of u */</span><span class="cp">
+</span><span class="cp">#define loBit(u)      ((u) &amp; 0x00000001U)  </span><span class="cm">/* mask all but lowest    bit of u */</span><span class="cp">
+</span><span class="cp">#define loBits(u)     ((u) &amp; 0x7FFFFFFFU)  </span><span class="cm">/* mask     the highest   bit of u */</span><span class="cp">
+</span><span class="cp">#define mixBits(u, v) (hiBit(u)|loBits(v)) </span><span class="cm">/* move hi bit of u to hi bit of v */</span><span class="cp">
+</span><span class="cp">#define twist(m,u,v)  (m ^ (mixBits(u,v)&gt;&gt;1) ^ ((uint32_t)(-(int32_t)(loBit(v))) &amp; 0x9908b0dfU))
+</span><span class="cp">#define twist_php(m,u,v)  (m ^ (mixBits(u,v)&gt;&gt;1) ^ ((uint32_t)(-(int32_t)(loBit(u))) &amp; 0x9908b0dfU))
+</span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<p><strong>MT_RAND_MT19937 模式</strong></p>
+<p>对于右半部分，当 <code>state[i+1]</code> 最低位为 0 时，右半部分为 0，当 <code>state[i+1]</code> 最低位为 1 时，右半部分为 0x9908b0dfU</p>
+<p>由于 0x9908b0dfU 最高位为 1，所以右半部分最高位与 <code>state[i+1]</code> 最低位相同</p>
+<p>又由于 <code>mixBits(u,v)&gt;&gt;1</code> 最高位一定为0，若我们已知 <code>state_reload[i]</code> 与 <code>state_reload[i-227]</code>，则 <code>state_reload[i] ^ state_reload[i-227]</code> 最高位与右半部分最高位即与 <code>state[i+1]</code> 最低位相同</p>
+<p>进而求出 <code>mixBits(u,v) &gt;&gt; 1</code> 的值，该值的低 30 位为 <code>state[i+1]</code> 的 1~30 位，30 位为 <code>state[i]</code> 的最高位</p>
+<p>此时我们已知 <code>state[i+1]</code> 的低 31 位，则该值共有两种情况，我们可以根据这两种情况分别求出对应的种子 (通过分析 <code>php_mt_initialize</code> 函数)，利用该种子生成的 <code>state_reload</code> 与已知值比较，确定正确的种子值</p>
+</li>
+<li>
+<p><strong>MT_RAND_PHP 模式</strong></p>
+<p>由于右半部分最高位与 <code>state[i]</code> 最高位相同，所以可以只能得到 <code>state[i+1]</code> 的 1~31 位，共有四种情况</p>
+</li>
+</ul>
+<h3 id="php_mt_initialize">php_mt_initialize</h3>
+<p><code>php_mt_initialize</code> 比较简单，每一个值都只与前一个值相关，其生成过程为</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mh">0x6c078965U</span> <span class="o">*</span> <span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">^</span> <span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;&gt;</span> <span class="mi">30</span><span class="p">))</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xffffffffU</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>其中 <code>&amp; 0xffffffffU</code> 操作等价于 <code>% 0X100000000U</code></p>
+<p>求得 0x6c078965 对于模 0x100000000 的逆为 0x9638806d</p>
+<p>故该操作的逆操作为</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mh">0x9638806dU</span> <span class="o">*</span> <span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">i</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0xffffffffU</span><span class="p">;</span>
+<span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">^=</span> <span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;&gt;</span> <span class="mi">30</span><span class="p">;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="0x03-逆操作综合">0x03 逆操作综合</h2>
+<p>将各个函数的逆操作综合一下，在我们已知相距 227 的两个随机数 <code>rand[i]</code> 与 <code>rand[i-227]</code> 和对应的 <code>i</code> 的情况下，<code>state_reload[i]</code> 与 <code>state_reload[i-227]</code> 的取值共有四种组合，对每一种组合分别进行逆操作得到种子，并通过测试确定正确的种子 (一般来说只有一种组合可以得到有效的种子)</p>
+<p>简单写了一个 <code>mt_rand</code> 种子还原的程序</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-c" data-lang="c"><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
+</span><span class="cp">#include</span> <span class="cpf">&lt;stdint.h&gt;</span><span class="cp">
+</span><span class="cp"></span>
+<span class="cp">#define N             (624)
+</span><span class="cp">#define M             (397)
+</span><span class="cp">#define hiBit(u)      ((u) &amp; 0x80000000U)
+</span><span class="cp">#define loBit(u)      ((u) &amp; 0x00000001U)
+</span><span class="cp">#define loBits(u)     ((u) &amp; 0x7FFFFFFFU)
+</span><span class="cp">#define mixBits(u, v) (hiBit(u)|loBits(v))
+</span><span class="cp"></span>
+<span class="cp">#define twist(m,u,v)  (m ^ (mixBits(u,v)&gt;&gt;1) ^ ((uint32_t)(-(int32_t)(loBit(v))) &amp; 0x9908b0dfU))
+</span><span class="cp">#define twist_php(m,u,v)  (m ^ (mixBits(u,v)&gt;&gt;1) ^ ((uint32_t)(-(int32_t)(loBit(u))) &amp; 0x9908b0dfU))
+</span><span class="cp"></span>
+<span class="k">static</span> <span class="kr">inline</span> <span class="kt">void</span> <span class="nf">php_mt_initialize</span><span class="p">(</span><span class="n">uint32_t</span> <span class="n">seed</span><span class="p">,</span> <span class="n">uint32_t</span> <span class="o">*</span><span class="n">state</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">uint32_t</span> <span class="o">*</span><span class="n">s</span> <span class="o">=</span> <span class="n">state</span><span class="p">;</span>
+    <span class="n">uint32_t</span> <span class="o">*</span><span class="n">r</span> <span class="o">=</span> <span class="n">state</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+    <span class="o">*</span><span class="n">s</span><span class="o">++</span> <span class="o">=</span> <span class="n">seed</span> <span class="o">&amp;</span> <span class="mh">0xffffffffU</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span> <span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span> <span class="p">)</span> <span class="p">{</span>
+        <span class="o">*</span><span class="n">s</span><span class="o">++</span> <span class="o">=</span> <span class="p">(</span> <span class="mi">1812433253U</span> <span class="o">*</span> <span class="p">(</span> <span class="o">*</span><span class="n">r</span> <span class="o">^</span> <span class="p">(</span><span class="o">*</span><span class="n">r</span> <span class="o">&gt;&gt;</span> <span class="mi">30</span><span class="p">)</span> <span class="p">)</span> <span class="o">+</span> <span class="n">i</span> <span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xffffffffU</span><span class="p">;</span>
+        <span class="n">r</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kr">inline</span> <span class="kt">void</span> <span class="nf">php_mt_reload</span><span class="p">(</span><span class="n">uint32_t</span> <span class="o">*</span><span class="n">state</span><span class="p">,</span> <span class="n">uint32_t</span> <span class="n">mode</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">uint32_t</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">state</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">mode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="n">N</span> <span class="o">-</span> <span class="n">M</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">;</span> <span class="o">++</span><span class="n">p</span><span class="p">)</span>
+            <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">twist</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="n">M</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="n">M</span><span class="p">;</span> <span class="o">--</span><span class="n">i</span><span class="p">;</span> <span class="o">++</span><span class="n">p</span><span class="p">)</span>
+            <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">twist</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="n">M</span><span class="o">-</span><span class="n">N</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+        <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">twist</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="n">M</span><span class="o">-</span><span class="n">N</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="n">N</span> <span class="o">-</span> <span class="n">M</span><span class="p">;</span> <span class="n">i</span><span class="o">--</span><span class="p">;</span> <span class="o">++</span><span class="n">p</span><span class="p">)</span>
+            <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">twist_php</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="n">M</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="n">M</span><span class="p">;</span> <span class="o">--</span><span class="n">i</span><span class="p">;</span> <span class="o">++</span><span class="n">p</span><span class="p">)</span>
+            <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">twist_php</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="n">M</span><span class="o">-</span><span class="n">N</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+        <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">twist_php</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="n">M</span><span class="o">-</span><span class="n">N</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">state</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">uint32_t</span> <span class="nf">reverse_php_mt_rand</span><span class="p">(</span><span class="n">uint32_t</span> <span class="n">s1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">uint32_t</span> <span class="n">s2</span><span class="p">;</span>
+
+    <span class="n">s1</span> <span class="o">^=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&gt;&gt;</span> <span class="mi">18</span><span class="p">);</span>
+
+    <span class="n">s1</span> <span class="o">^=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">15</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xefc60000U</span><span class="p">;</span>
+
+    <span class="n">s2</span> <span class="o">=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">21</span><span class="p">)</span> <span class="o">^</span> <span class="p">(((</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x9d2c5680U</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">21</span><span class="p">);</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">14</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">s2</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x9d2c5680U</span> <span class="o">&lt;&lt;</span> <span class="mi">14</span><span class="p">));</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">s2</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mh">0x9d2c5680U</span> <span class="o">&lt;&lt;</span> <span class="mi">7</span><span class="p">));</span>
+    <span class="n">s1</span> <span class="o">^=</span> <span class="n">s2</span> <span class="o">&amp;</span> <span class="mh">0x9d2c5680U</span><span class="p">;</span>
+
+    <span class="n">s1</span> <span class="o">^=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&gt;&gt;</span> <span class="mi">11</span><span class="p">);</span>
+    <span class="n">s1</span> <span class="o">^=</span> <span class="p">(</span><span class="n">s1</span> <span class="o">&gt;&gt;</span> <span class="mi">22</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">s1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">uint32_t</span> <span class="nf">reverse_php_mt_initialize</span><span class="p">(</span><span class="n">uint32_t</span> <span class="n">si</span><span class="p">,</span> <span class="n">uint32_t</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">uint32_t</span> <span class="n">j</span> <span class="o">=</span> <span class="n">i</span><span class="p">;</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">uint32_t</span> <span class="n">temp</span> <span class="o">=</span> <span class="p">(</span><span class="mh">0x9638806dU</span> <span class="o">*</span> <span class="p">(</span><span class="n">si</span> <span class="o">-</span> <span class="n">j</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0xffffffffU</span><span class="p">;</span>
+        <span class="n">si</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">^</span> <span class="p">(</span><span class="n">temp</span> <span class="o">&gt;&gt;</span> <span class="mi">30</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">si</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">uint32_t</span> <span class="nf">reverse_php_mt_reload_0</span><span class="p">(</span><span class="n">uint32_t</span> <span class="n">sri</span><span class="p">,</span> <span class="n">uint32_t</span> <span class="n">sri_227</span><span class="p">,</span> <span class="n">uint32_t</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">uint32_t</span> <span class="n">si_1_lsb</span> <span class="o">=</span> <span class="p">(</span><span class="n">sri</span> <span class="o">^</span> <span class="n">sri_227</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">31</span><span class="p">;</span> <span class="c1">// LSB of state[i+1]
+</span><span class="c1"></span>    <span class="n">uint32_t</span> <span class="n">mix</span> <span class="o">=</span> <span class="p">(</span><span class="n">sri</span> <span class="o">^</span> <span class="n">sri_227</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">si_1_lsb</span> <span class="o">?</span> <span class="mh">0x9908b0dfU</span> <span class="o">:</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="n">uint32_t</span> <span class="n">si_1_31</span> <span class="o">=</span> <span class="p">(</span><span class="n">mix</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="n">si_1_lsb</span><span class="p">;</span> <span class="c1">// 0~30 bits of state[i+1]
+</span><span class="c1"></span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">uint32_t</span> <span class="n">h</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">h</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">;</span> <span class="n">h</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">uint32_t</span> <span class="n">si_1</span> <span class="o">=</span> <span class="n">si_1_31</span> <span class="o">|</span> <span class="p">(</span><span class="n">h</span> <span class="o">&lt;&lt;</span> <span class="mi">31</span><span class="p">);</span>
+        <span class="n">uint32_t</span> <span class="n">seed</span> <span class="o">=</span> <span class="n">reverse_php_mt_initialize</span><span class="p">(</span><span class="n">si_1</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="n">uint32_t</span> <span class="n">state</span><span class="p">[</span><span class="n">N</span><span class="p">];</span>
+        <span class="n">php_mt_initialize</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
+        <span class="n">php_mt_reload</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">227</span><span class="p">]</span> <span class="o">==</span> <span class="n">sri_227</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">seed</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">uint32_t</span> <span class="nf">reverse_php_mt_reload_1</span><span class="p">(</span><span class="n">uint32_t</span> <span class="n">sri</span><span class="p">,</span> <span class="n">uint32_t</span> <span class="n">sri_227</span><span class="p">,</span> <span class="n">uint32_t</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">uint32_t</span> <span class="n">si_lsb</span> <span class="o">=</span> <span class="p">(</span><span class="n">sri</span> <span class="o">^</span> <span class="n">sri_227</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">31</span><span class="p">;</span> <span class="c1">// LSB of state[i]
+</span><span class="c1"></span>    <span class="n">uint32_t</span> <span class="n">mix</span> <span class="o">=</span> <span class="p">(</span><span class="n">sri</span> <span class="o">^</span> <span class="n">sri_227</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">si_lsb</span> <span class="o">?</span> <span class="mh">0x9908b0dfU</span> <span class="o">:</span> <span class="mi">0</span><span class="p">);</span>
+    <span class="n">uint32_t</span> <span class="n">si_1_1_30</span> <span class="o">=</span> <span class="n">mix</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span><span class="p">;</span> <span class="c1">// 1~30 bits of state[i+1]
+</span><span class="c1"></span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">uint32_t</span> <span class="n">h</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">h</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">;</span> <span class="n">h</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">uint32_t</span> <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">l</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">;</span> <span class="n">l</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">uint32_t</span> <span class="n">si_1</span> <span class="o">=</span> <span class="n">si_1_1_30</span> <span class="o">|</span> <span class="n">l</span> <span class="o">|</span> <span class="p">(</span><span class="n">h</span> <span class="o">&lt;&lt;</span> <span class="mi">31</span><span class="p">);</span>
+            <span class="n">uint32_t</span> <span class="n">seed</span> <span class="o">=</span> <span class="n">reverse_php_mt_initialize</span><span class="p">(</span><span class="n">si_1</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+            <span class="n">uint32_t</span> <span class="n">state</span><span class="p">[</span><span class="n">N</span><span class="p">];</span>
+            <span class="n">php_mt_initialize</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">state</span><span class="p">);</span>
+            <span class="n">php_mt_reload</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">227</span><span class="p">]</span> <span class="o">==</span> <span class="n">sri_227</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="n">seed</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">uint32_t</span> <span class="n">i</span><span class="p">;</span> <span class="c1">// index of one random number
+</span><span class="c1"></span>    <span class="n">uint32_t</span> <span class="n">ri_227</span><span class="p">;</span> <span class="c1">// rand[i-227]
+</span><span class="c1"></span>    <span class="n">uint32_t</span> <span class="n">ri</span><span class="p">;</span> <span class="c1">// rand[i]
+</span><span class="c1"></span>    <span class="n">uint32_t</span> <span class="n">mode</span><span class="p">;</span> <span class="c1">// 0 for MT_RAND_MT19937 / 1 for MT_RAND_PHP
+</span><span class="c1"></span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"i(&gt;=227):"</span><span class="p">);</span>
+    <span class="n">scanf</span><span class="p">(</span><span class="s">"%u"</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"rand[i-227]([%u]):"</span><span class="p">,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">227</span><span class="p">);</span>
+    <span class="n">scanf</span><span class="p">(</span><span class="s">"%u"</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ri_227</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"rand[i]([%u]):"</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+    <span class="n">scanf</span><span class="p">(</span><span class="s">"%u"</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">ri</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"mode(0/1):"</span><span class="p">);</span>
+    <span class="n">scanf</span><span class="p">(</span><span class="s">"%u"</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">mode</span><span class="p">);</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">uint32_t</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">;</span> <span class="n">a</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">uint32_t</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">b</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">;</span> <span class="n">b</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">uint32_t</span> <span class="n">sri</span> <span class="o">=</span> <span class="n">reverse_php_mt_rand</span><span class="p">((</span><span class="n">ri</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="n">a</span><span class="p">);</span>
+            <span class="n">uint32_t</span> <span class="n">sri_227</span> <span class="o">=</span> <span class="n">reverse_php_mt_rand</span><span class="p">((</span><span class="n">ri_227</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="n">b</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">mode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">"%u</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">reverse_php_mt_reload_0</span><span class="p">(</span><span class="n">sri</span><span class="p">,</span> <span class="n">sri_227</span><span class="p">,</span> <span class="n">i</span><span class="p">));</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">"%u</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">reverse_php_mt_reload_1</span><span class="p">(</span><span class="n">sri</span><span class="p">,</span> <span class="n">sri_227</span><span class="p">,</span> <span class="n">i</span><span class="p">));</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="0x04-测试">0x04 测试</h2>
+<p>通过 0x01 中的题对上述代码进行简单测试</p>
+<p>首先生成 228 个随机数，由于加密时已经生成 2 个随机数，所以此时输出第一个随机数为 <code>rand[2]</code>，最后一个随机数为 <code>rand[229]</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">/flag.php?pass=nya_nop_nya~&amp;roll=228
+</code></pre></td></tr></table>
+</div>
+</div><p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;生成 288 个随机数&lt;/h2&gt;&lt;p&gt;random number generation&lt;/p&gt;" data-thumbnail="/posts/php-mt_rand-break/generation.png" href="/posts/php-mt_rand-break/generation.png" title="random number generation">
+<img alt="/posts/php-mt_rand-break/generation.png" class="lazyload" data-sizes="auto" data-src="generation.png" data-srcset="/posts/php-mt_rand-break/generation.png, generation.png 1.5x, /posts/php-mt_rand-break/generation.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">生成 288 个随机数</figcaption>
+</figure></p>
+<p>使用上述代码进行种子还原操作，其中 i 为 229，mode 为 0</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;还原随机数种子&lt;/h2&gt;&lt;p&gt;seed recovery&lt;/p&gt;" data-thumbnail="/posts/php-mt_rand-break/seed-recovery.png" href="/posts/php-mt_rand-break/seed-recovery.png" title="seed recovery">
+<img alt="/posts/php-mt_rand-break/seed-recovery.png" class="lazyload" data-sizes="auto" data-src="seed-recovery.png" data-srcset="/posts/php-mt_rand-break/seed-recovery.png, seed-recovery.png 1.5x, /posts/php-mt_rand-break/seed-recovery.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">还原随机数种子</figcaption>
+</figure></p>
+<p>比较结果可知，随机数种子应为 <code>15370470</code>，使用该种子生成随机数对给定加密信息进行解密即可得到 flag</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;解密得到 flag&lt;/h2&gt;&lt;p&gt;flag&lt;/p&gt;" data-thumbnail="/posts/php-mt_rand-break/flag.png" href="/posts/php-mt_rand-break/flag.png" title="flag">
+<img alt="/posts/php-mt_rand-break/flag.png" class="lazyload" data-sizes="auto" data-src="flag.png" data-srcset="/posts/php-mt_rand-break/flag.png, flag.png 1.5x, /posts/php-mt_rand-break/flag.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">解密得到 flag</figcaption>
+</figure></p>
+<h2 id="0x05-后记">0x05 后记</h2>
+<p>众所周知，不会密码学的二进制不是一个合格的 Web 手（x</p>
+</div><div class="post-footer" id="post-footer">
+<div class="post-info">
+<div class="post-info-line">
+<div class="post-info-mod">
+<span>更新于 2021-06-07</span>
+</div>
+<div class="post-info-license"></div>
+</div>
+<div class="post-info-line">
+<div class="post-info-md"><span>
+<a class="link-to-markdown" href="/posts/php-mt_rand-break/index.md" target="_blank">阅读原始文档</a>
+</span></div>
+<div class="post-info-share">
+<span></span>
+</div>
+</div>
+</div>
+<div class="post-info-more">
+<section class="post-tags"><i class="fas fa-tags fa-fw"></i> <a href="/tags/php/">PHP</a>, <a href="/tags/mt_rand/">mt_rand</a></section>
+<section>
+<span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span> | <span><a href="/">主页</a></span>
+</section>
+</div>
+<div class="post-nav"><a class="prev" href="/posts/blog-migration/" rel="prev" title="博客迁移记"><i class="fas fa-angle-left fa-fw"></i>博客迁移记</a></div>
+</div>
+<div id="comments"><div class="comment" id="valine"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
+            </noscript></div></article></div>
+</main><footer class="footer">
+<div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" rel="noopener noreffer" target="_blank" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" rel="noopener noreffer" target="_blank" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+</div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2021</span><span class="author" itemprop="copyrightHolder"> <a href="/" target="_blank">X5tar</a></span> | <span class="license"><a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license external nofollow noopener noreffer" target="_blank">CC BY-SA 4.0</a></span></div>
+</div>
+</footer></div>
+<div id="fixed-buttons"><a class="fixed-button" href="#" id="back-to-top" title="回到顶部">
+<i class="fas fa-arrow-up fa-fw"></i>
+</a><a class="fixed-button" href="#" id="view-comments" title="查看评论">
+<i class="fas fa-comment fa-fw"></i>
+</a>
+</div><link href="/lib/valine/valine.min.css" rel="stylesheet"/><link href="/lib/lightgallery/lightgallery.min.css" rel="stylesheet"/><script src="/lib/valine/Valine.min.js" type="text/javascript"></script><script src="/lib/smooth-scroll/smooth-scroll.min.js" type="text/javascript"></script><script src="/lib/autocomplete/autocomplete.min.js" type="text/javascript"></script><script src="/lib/algoliasearch/algoliasearch-lite.umd.min.js" type="text/javascript"></script><script src="/lib/lazysizes/lazysizes.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lightgallery.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-thumbnail.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-zoom.min.js" type="text/javascript"></script><script src="/lib/clipboard/clipboard.min.js" type="text/javascript"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{"valine":{"appId":"iAbQo5y0XlBlUP9F0K3Tyx8f-MdYXbMMI","appKey":"ML5YMAAFe45gCJawVJcUkrg0","el":"#valine","emojiCDN":"https://cdn.jsdelivr.net/npm/emoji-datasource-google@5.0.1/img/google/64/","emojiMaps":{"100":"1f4af.png","alien":"1f47d.png","anger":"1f4a2.png","angry":"1f620.png","anguished":"1f627.png","astonished":"1f632.png","black_heart":"1f5a4.png","blue_heart":"1f499.png","blush":"1f60a.png","bomb":"1f4a3.png","boom":"1f4a5.png","broken_heart":"1f494.png","brown_heart":"1f90e.png","clown_face":"1f921.png","cold_face":"1f976.png","cold_sweat":"1f630.png","confounded":"1f616.png","confused":"1f615.png","cry":"1f622.png","crying_cat_face":"1f63f.png","cupid":"1f498.png","dash":"1f4a8.png","disappointed":"1f61e.png","disappointed_relieved":"1f625.png","dizzy":"1f4ab.png","dizzy_face":"1f635.png","drooling_face":"1f924.png","exploding_head":"1f92f.png","expressionless":"1f611.png","face_vomiting":"1f92e.png","face_with_cowboy_hat":"1f920.png","face_with_hand_over_mouth":"1f92d.png","face_with_head_bandage":"1f915.png","face_with_monocle":"1f9d0.png","face_with_raised_eyebrow":"1f928.png","face_with_rolling_eyes":"1f644.png","face_with_symbols_on_mouth":"1f92c.png","face_with_thermometer":"1f912.png","fearful":"1f628.png","flushed":"1f633.png","frowning":"1f626.png","ghost":"1f47b.png","gift_heart":"1f49d.png","green_heart":"1f49a.png","grimacing":"1f62c.png","grin":"1f601.png","grinning":"1f600.png","hankey":"1f4a9.png","hear_no_evil":"1f649.png","heart":"2764-fe0f.png","heart_decoration":"1f49f.png","heart_eyes":"1f60d.png","heart_eyes_cat":"1f63b.png","heartbeat":"1f493.png","heartpulse":"1f497.png","heavy_heart_exclamation_mark_ornament":"2763-fe0f.png","hole":"1f573-fe0f.png","hot_face":"1f975.png","hugging_face":"1f917.png","hushed":"1f62f.png","imp":"1f47f.png","innocent":"1f607.png","japanese_goblin":"1f47a.png","japanese_ogre":"1f479.png","joy":"1f602.png","joy_cat":"1f639.png","kiss":"1f48b.png","kissing":"1f617.png","kissing_cat":"1f63d.png","kissing_closed_eyes":"1f61a.png","kissing_heart":"1f618.png","kissing_smiling_eyes":"1f619.png","laughing":"1f606.png","left_speech_bubble":"1f5e8-fe0f.png","love_letter":"1f48c.png","lying_face":"1f925.png","mask":"1f637.png","money_mouth_face":"1f911.png","nauseated_face":"1f922.png","nerd_face":"1f913.png","neutral_face":"1f610.png","no_mouth":"1f636.png","open_mouth":"1f62e.png","orange_heart":"1f9e1.png","partying_face":"1f973.png","pensive":"1f614.png","persevere":"1f623.png","pleading_face":"1f97a.png","pouting_cat":"1f63e.png","purple_heart":"1f49c.png","rage":"1f621.png","relaxed":"263a-fe0f.png","relieved":"1f60c.png","revolving_hearts":"1f49e.png","right_anger_bubble":"1f5ef-fe0f.png","robot_face":"1f916.png","rolling_on_the_floor_laughing":"1f923.png","scream":"1f631.png","scream_cat":"1f640.png","see_no_evil":"1f648.png","shushing_face":"1f92b.png","skull":"1f480.png","skull_and_crossbones":"2620-fe0f.png","sleeping":"1f634.png","sleepy":"1f62a.png","slightly_frowning_face":"1f641.png","slightly_smiling_face":"1f642.png","smile":"1f604.png","smile_cat":"1f638.png","smiley":"1f603.png","smiley_cat":"1f63a.png","smiling_face_with_3_hearts":"1f970.png","smiling_imp":"1f608.png","smirk":"1f60f.png","smirk_cat":"1f63c.png","sneezing_face":"1f927.png","sob":"1f62d.png","space_invader":"1f47e.png","sparkling_heart":"1f496.png","speak_no_evil":"1f64a.png","speech_balloon":"1f4ac.png","star-struck":"1f929.png","stuck_out_tongue":"1f61b.png","stuck_out_tongue_closed_eyes":"1f61d.png","stuck_out_tongue_winking_eye":"1f61c.png","sunglasses":"1f60e.png","sweat":"1f613.png","sweat_drops":"1f4a6.png","sweat_smile":"1f605.png","thinking_face":"1f914.png","thought_balloon":"1f4ad.png","tired_face":"1f62b.png","triumph":"1f624.png","two_hearts":"1f495.png","unamused":"1f612.png","upside_down_face":"1f643.png","weary":"1f629.png","white_frowning_face":"2639-fe0f.png","white_heart":"1f90d.png","wink":"1f609.png","woozy_face":"1f974.png","worried":"1f61f.png","yawning_face":"1f971.png","yellow_heart":"1f49b.png","yum":"1f60b.png","zany_face":"1f92a.png","zipper_mouth_face":"1f910.png","zzz":"1f4a4.png"},"enableQQ":null,"highlight":true,"lang":"zh-cn","placeholder":"你的评论 ...","recordIP":null,"visitor":null}},"lightGallery":{"actualSize":false,"exThumbImage":"data-thumbnail","hideBarsDelay":2000,"selector":".lightgallery","speed":400,"thumbContHeight":80,"thumbWidth":80,"thumbnail":true},"search":{"algoliaAppID":"3M3B3KM4LG","algoliaIndex":"blog","algoliaSearchKey":"babfa85706a3a4a0025db8ff2fdf3525","highlightTag":null,"maxResultLength":null,"noResultsFound":"没有找到结果","snippetLength":null,"type":"algolia"}};</script><script src="/js/theme.min.js" type="text/javascript"></script><script type="text/javascript">
+            window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());
+            gtag('config', 'UA-160185073-2');
+        </script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-160185073-2" type="text/javascript"></script></body>
+</html>

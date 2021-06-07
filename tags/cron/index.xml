@@ -1,0 +1,15 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Cron - 标签 - X5tar&#39;s Blog</title>
+        <link>https://x5tar.com/tags/cron/</link>
+        <description>Cron - 标签 - X5tar&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>x5tar@qq.com (X5tar)</managingEditor>
+            <webMaster>x5tar@qq.com (X5tar)</webMaster><lastBuildDate>Sun, 21 Jun 2020 17:09:13 &#43;0800</lastBuildDate><atom:link href="https://x5tar.com/tags/cron/" rel="self" type="application/rss+xml" /><item>
+    <title>Linux Cron 定时任务</title>
+    <link>https://x5tar.com/posts/linux-crontab/</link>
+    <pubDate>Sun, 21 Jun 2020 17:09:13 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://x5tar.com/posts/linux-crontab/</guid>
+    <description><![CDATA[0x00 前言 在做一道涉及到 redis 未授权访问的题的时候，看到了使用到 /var/spool/cron/ 目录反弹 shell 后查询得知 Linux Cron 定时任务，在此记录下来 0x01 相关文件 与 Cron 相关的文件主要存在以下]]></description>
+</item></channel>
+</rss>
