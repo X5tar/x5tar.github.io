@@ -5,9 +5,23 @@
 <link>https://x5tar.com/</link>
 <description>X5tar's Blog</description>
 <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>x5tar@qq.com (X5tar)</managingEditor>
-<webMaster>x5tar@qq.com (X5tar)</webMaster><lastBuildDate>Mon, 07 Jun 2021 19:30:03 +0800</lastBuildDate>
+<webMaster>x5tar@qq.com (X5tar)</webMaster><lastBuildDate>Thu, 10 Jun 2021 17:01:50 +0800</lastBuildDate>
 <atom:link href="https://x5tar.com/index.xml" rel="self" type="application/rss+xml"/>
 <item>
+<title>Python pickle 反序列化安全简述</title>
+<link>https://x5tar.com/posts/python-pickle-unserialize/</link>
+<pubDate>Thu, 10 Jun 2021 17:01:50 +0800</pubDate>
+<author>作者</author>
+<guid>https://x5tar.com/posts/python-pickle-unserialize/</guid>
+<description>0x00 前言 最近的比赛遇到过好几次 pickle 反序列化，而且每次都有不同的条件和利用方法，不像 PHP 反序列化有相对固定的操作，就打算简单的总结一下，也方便自己以</description>
+</item><item>
+<title>CISCN 2021 西南分区赛 Web3 Break&amp;Fix WriteUp</title>
+<link>https://x5tar.com/posts/ciscn-2021-ws-web3/</link>
+<pubDate>Thu, 10 Jun 2021 16:41:40 +0800</pubDate>
+<author>作者</author>
+<guid>https://x5tar.com/posts/ciscn-2021-ws-web3/</guid>
+<description>0x00 前言 一次体验还可以的线下，一共就出了两个 Web 题还都是一血就很开心，由于 Web1 过于简单 (sqlmap 一把梭了)，而 Web2 由于前半部分没有做出来，仅仅对其后半部分 (</description>
+</item><item>
 <title>还原 PHP mt_rand 种子</title>
 <link>https://x5tar.com/posts/php-mt_rand-break/</link>
 <pubDate>Mon, 07 Jun 2021 19:30:03 +0800</pubDate>
@@ -63,19 +77,5 @@
 <author>作者</author>
 <guid>https://x5tar.com/posts/hfctf-web/</guid>
 <description>0x00 前言 当时比赛的时候，一共三道 WEB 题，两道 nodejs 的都不会，还有一道 PHP 没来得及看后来看了也不会（还是太菜了 趁题还热乎，借着 dalao 们的 WP 复现一波 0x01 easy_login 由于静</description>
-</item><item>
-<title>绕过字符数限制 getshell</title>
-<link>https://x5tar.com/posts/bypass-char-number-limit/</link>
-<pubDate>Sat, 18 Apr 2020 12:56:22 +0800</pubDate>
-<author>作者</author>
-<guid>https://x5tar.com/posts/bypass-char-number-limit/</guid>
-<description>0x00 前言 之前做题有做到过字数限制的 shell，有五个字符也有四个字符的，当然我一直不会做，最近又重新研究了一下这个绕过的问题，就把它记录下来了</description>
-</item><item>
-<title>Git 学习笔记</title>
-<link>https://x5tar.com/posts/learn-git/</link>
-<pubDate>Wed, 19 Feb 2020 17:10:16 +0800</pubDate>
-<author>作者</author>
-<guid>https://x5tar.com/posts/learn-git/</guid>
-<description>〇、获取本地仓库 git init 初始化仓库 git clone &amp;lt;url&amp;gt; 从远程仓库克隆（url 可采用 git、http、https 和 ssh 等协议） 一、本地文件修改、提交及查看等 git status 查</description>
 </item></channel>
 </rss>

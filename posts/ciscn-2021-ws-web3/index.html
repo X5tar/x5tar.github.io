@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="noodp" name="robots"/>
+<meta content="IE=edge, chrome=1" http-equiv="X-UA-Compatible"/>
+<title>CISCN 2021 西南分区赛 Web3 Break&amp;Fix WriteUp - X5tar's Blog</title><meta content="" name="Description"/><meta content="CISCN 2021 西南分区赛 Web3 Break&amp;Fix WriteUp" property="og:title"/>
+<meta content="0x00 前言 一次体验还可以的线下，一共就出了两个 Web 题还都是一血就很开心，由于 Web1 过于简单 (sqlmap 一把梭了)，而 Web2 由于前半部分没有做出来，仅仅对其后半部分 (" property="og:description"/>
+<meta content="article" property="og:type"/>
+<meta content="https://x5tar.com/posts/ciscn-2021-ws-web3/" property="og:url"/><meta content="posts" property="article:section"/>
+<meta content="2021-06-10T16:41:40+08:00" property="article:published_time"/>
+<meta content="2021-06-10T16:41:40+08:00" property="article:modified_time"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="CISCN 2021 西南分区赛 Web3 Break&amp;Fix WriteUp" name="twitter:title"/>
+<meta content="0x00 前言 一次体验还可以的线下，一共就出了两个 Web 题还都是一血就很开心，由于 Web1 过于简单 (sqlmap 一把梭了)，而 Web2 由于前半部分没有做出来，仅仅对其后半部分 (" name="twitter:description"/>
+<meta content="X5tar's Blog" name="application-name"/>
+<meta content="X5tar's Blog" name="apple-mobile-web-app-title"/><link href="/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/><link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/><link href="/site.webmanifest" rel="manifest"/><link href="https://x5tar.com/posts/ciscn-2021-ws-web3/" rel="canonical"/><link href="https://x5tar.com/posts/php-mt_rand-break/" rel="prev"/><link href="https://x5tar.com/posts/python-pickle-unserialize/" rel="next"/><link href="/lib/normalize/normalize.min.css" rel="stylesheet"/><link href="/css/style.min.css" rel="stylesheet"/><link href="/lib/fontawesome-free/all.min.css" rel="stylesheet"/><link href="/lib/animate/animate.min.css" rel="stylesheet"/><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "CISCN 2021 西南分区赛 Web3 Break\u0026Fix WriteUp",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/x5tar.com\/posts\/ciscn-2021-ws-web3\/"
+        },"genre": "posts","keywords": "CISCN 2021, Web 安全, Python, Flask, pickle 反序列化","wordcount":  1582 ,
+        "url": "https:\/\/x5tar.com\/posts\/ciscn-2021-ws-web3\/","datePublished": "2021-06-10T16:41:40+08:00","dateModified": "2021-06-10T16:41:40+08:00","publisher": {
+            "@type": "Organization",
+            "name": "X5tar"},"author": {
+                "@type": "Person",
+                "name": "X5tar"
+            },"description": ""
+    }
+    </script></head>
+<body header-desktop="" header-mobile=""><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : '' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+<div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu">
+<div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><a class="menu-item" href="/friends/"> Friends </a><a class="menu-item" href="/about/"> About </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+<input id="search-input-desktop" placeholder="搜索文章标题或内容..." type="text"/>
+<a class="search-button search-toggle" href="javascript:void(0);" id="search-toggle-desktop" title="搜索">
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a class="search-button search-clear" href="javascript:void(0);" id="search-clear-desktop" title="清空">
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id="search-loading-desktop">
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</span><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a>
+</div>
+</div>
+</div>
+</header><header class="mobile" id="header-mobile">
+<div class="header-container">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu-toggle" id="menu-toggle-mobile">
+<span></span><span></span><span></span>
+</div>
+</div>
+<div class="menu" id="menu-mobile"><div class="search-wrapper">
+<div class="search mobile" id="search-mobile">
+<input id="search-input-mobile" placeholder="搜索文章标题或内容..." type="text"/>
+<a class="search-button search-toggle" href="javascript:void(0);" id="search-toggle-mobile" title="搜索">
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a class="search-button search-clear" href="javascript:void(0);" id="search-clear-mobile" title="清空">
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id="search-loading-mobile">
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</div>
+<a class="search-cancel" href="javascript:void(0);" id="search-cancel-mobile">
+                        取消
+                    </a>
+</div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/categories/" title="">Categories</a><a class="menu-item" href="/friends/" title="">Friends</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a></div>
+</div>
+</header>
+<div class="search-dropdown desktop">
+<div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+<div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+<div class="container"><div class="toc" id="toc-auto">
+<h2 class="toc-title">目录</h2>
+<div class="toc-content" id="toc-content-auto"></div>
+</div><article class="page single"><h1 class="single-title animated flipInX">CISCN 2021 西南分区赛 Web3 Break&amp;Fix WriteUp</h1><div class="post-meta">
+<div class="post-meta-line"><span class="post-author"><a class="author" href="/" rel="author" title="Author"><i class="fas fa-user-circle fa-fw"></i>X5tar</a></span> <span class="post-category">收录于 <a href="/categories/writeup/"><i class="far fa-folder fa-fw"></i>WriteUp</a></span></div>
+<div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i> <time datetime="2021-06-10">2021-06-10</time> <i class="fas fa-pencil-alt fa-fw"></i> 约 1582 字 
+                <i class="far fa-clock fa-fw"></i> 预计阅读 4 分钟 </div>
+</div><div class="details toc" id="toc-static" kept="">
+<div class="details-summary toc-title">
+<span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span>
+</div>
+<div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+<ul>
+<li><a href="#0x00-前言">0x00 前言</a></li>
+<li><a href="#0x01-break">0x01 Break</a>
+<ul>
+<li><a href="#源码泄露及分析">源码泄露及分析</a></li>
+<li><a href="#pickle-反序列化">pickle 反序列化</a></li>
+<li><a href="#session-伪造">session 伪造</a></li>
+</ul>
+</li>
+<li><a href="#0x02-fix">0x02 Fix</a></li>
+<li><a href="#0x03-后记">0x03 后记</a></li>
+</ul>
+</nav></div>
+</div><div class="content" id="content"><h2 id="0x00-前言">0x00 前言</h2>
+<p>一次体验还可以的线下，一共就出了两个 Web 题还都是一血就很开心，由于 Web1 过于简单 (sqlmap 一把梭了)，而 Web2 由于前半部分没有做出来，仅仅对其后半部分 (<a href="/posts/php-mt_rand-break/" rel="">还原 PHP mt_rand 种子</a>) 进行了分析，这里就只具体分析一下 Web3</p>
+<h2 id="0x01-break">0x01 Break</h2>
+<h3 id="源码泄露及分析">源码泄露及分析</h3>
+<p>扫目录发现 <code>/backup</code> 打开发现源码泄露</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">url_for</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">from</span> <span class="nn">settings</span> <span class="kn">import</span> <span class="n">SECRET_KEY</span><span class="p">,</span> <span class="n">User</span><span class="p">,</span> <span class="n">ADMIN_PASSWORD</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span>
+    <span class="n">SECRET_KEY</span><span class="o">=</span><span class="n">SECRET_KEY</span><span class="p">,</span>
+<span class="p">))</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">from_envvar</span><span class="p">(</span><span class="s1">'FLASKR_SETTINGS'</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+
+
+<span class="k">class</span> <span class="nc">RestrictedUnpickler</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">Unpickler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">find_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="c1"># Only allow safe classes</span>
+        <span class="k">if</span> <span class="n">module</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'settings'</span><span class="p">]</span> <span class="ow">and</span> <span class="s2">"__"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">module</span><span class="p">],</span> <span class="n">name</span><span class="p">)</span>
+        <span class="c1"># Forbid everything else.</span>
+        <span class="k">raise</span> <span class="n">pickle</span><span class="o">.</span><span class="n">UnpicklingError</span><span class="p">(</span><span class="s2">"global '</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">' is forbidden"</span> <span class="o">%</span> <span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">restricted_loads</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="s2">"""Helper function analogous to pickle.loads()."""</span>
+    <span class="k">return</span> <span class="n">RestrictedUnpickler</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">s</span><span class="p">))</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+
+<span class="c1"># index</span>
+<span class="nd">@app.route</span><span class="p">(</span><span class="s1">'/'</span><span class="p">)</span>
+<span class="nd">@app.route</span><span class="p">(</span><span class="s1">'/index'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'logged_in'</span><span class="p">,</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">'admin'</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">'index.html'</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s1">'/flag'</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">session</span><span class="p">[</span><span class="s1">'logged_in'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">session</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'Anonymous'</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">'&lt;img src="'</span> <span class="o">+</span> <span class="n">url_for</span><span class="p">(</span><span class="s1">'static'</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">'img/1.jpeg'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">'"&gt;&lt;br&gt;Please Login First, {} '</span>
+
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">'index.html'</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)))</span>
+
+
+<span class="c1"># load</span>
+<span class="nd">@app.route</span><span class="p">(</span><span class="s1">'/load'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">loads</span><span class="p">():</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">Haha</span> <span class="o">=</span> <span class="n">restricted_loads</span><span class="p">(</span><span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Haha</span><span class="p">,</span> <span class="n">User</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Haha</span><span class="o">.</span><span class="n">password</span> <span class="o">==</span> <span class="n">ADMIN_PASSWORD</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">'index.html'</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">Haha</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">'index.html'</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"&lt;img src='"</span> <span class="o">+</span> <span class="n">url_for</span><span class="p">(</span><span class="s1">'static'</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">'img/2.jpeg'</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"'&gt;&lt;br&gt;给👴🏻爬"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">'index.html'</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"&lt;img src='"</span> <span class="o">+</span> <span class="n">url_for</span><span class="p">(</span><span class="s1">'static'</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">'img/2.jpeg'</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"'&gt;&lt;br&gt;儒 雅 随 和"</span><span class="p">)</span>
+
+
+
+<span class="nd">@app.route</span><span class="p">(</span><span class="s1">'/backup'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hint</span><span class="p">():</span>
+    <span class="k">return</span> <span class="nb">open</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="s1">'rb'</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">'0.0.0.0'</span><span class="p">,</span><span class="n">debug</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">port</span><span class="o">=</span><span class="mi">5001</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>看源码发现两个值得注意的地方，第一个地方是 <code>index</code> 函数中通过 <code>session</code> 判断身份，若 <code>session['name']</code> 的值为 <code>admin</code> 则输出 <code>flag</code>，猜测需要 flask session 伪造，那么就需要知道 <code>SECRET_KEY</code> 的值，第二个地方是 <code>loads</code> 函数中存在 pickle 反序列化，查看 <code>RestrictedUnpickler</code> 类发现 <code>find_class</code> 限制 <code>module</code> 必须为 <code>settings</code> 而 <code>name</code> 中不能含有 <code>__</code>，而 <code>return render_template('index.html', msg=Haha.msg)</code> 处存在一个可控的输出点</p>
+<p>分析之后我们的做题逻辑就很清晰，第一步通过 pickle 反序列化泄露 <code>SECRET_KEY</code>，第二步伪造 session 输出 flag</p>
+<h3 id="pickle-反序列化">pickle 反序列化</h3>
+<blockquote>
+<p>对于 pickle 反序列化的介绍在这篇文章中：<a href="/posts/python-pickle-unserialize/" rel="">Python pickle 反序列化安全简述</a></p>
+</blockquote>
+<p>正如上文说的，V0 版本的序列化数据会 500，现场分析了一下默认版本 V4 的字节码然后手改了一下然后过了，这里写一下我手改 V4 版本序列化数据的过程，也算是一个分析 pickle 序列化数据的示例</p>
+<p>首先写一个测试用的 <code>User</code> 类</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># settings.py</span>
+<span class="k">class</span> <span class="nc">User</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="s2">"password"</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="s2">"msg"</span>
+
+<span class="c1"># app.py</span>
+<span class="kn">from</span> <span class="nn">settings</span> <span class="kn">import</span> <span class="n">User</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="k">print</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">User</span><span class="p">()))</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>并得到反序列化数据</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">\x80\x04\x952\x00\x00\x00\x00\x00\x00\x00\x8c\x08settings\x94\x8c\x04User\x94\x93\x94)\x81\x94}\x94(\x8c\x08password\x94h\x05\x8c\x03msg\x94h\x06ub.
+</code></pre></td></tr></table>
+</div>
+</div><p>对其进行简单分析</p>
+<ul>
+<li>
+<p><code>\x80\x04\x952\x00\x00\x00\x00\x00\x00\x00</code> 为版本描述和创建 frame（总的来说就是初始化</p>
+</li>
+<li>
+<p><code>\x8c\x08settings\x94</code> 入栈字符串并放入内存中，其中 <code>\x8c</code> 为入栈短字符串操作符，<code>\x08</code> 为字符串长度 (故最长 256 字节)，后面跟字符串，<code>\x94</code> 将栈顶元素放入 memo 中 (索引为递增的 1-byte 数字)</p>
+<p><code>\x8c\x04User\x94</code> <code>\x8c\x08password\x94</code> <code>\x8c\x03msg\x94</code> 同理</p>
+<blockquote>
+<p>pickle 会自动将栈中变量放入 memo 中，也可以不进行 <code>\x94</code> 操作</p>
+</blockquote>
+</li>
+<li>
+<p><code>\x93</code> 与 <code>c</code> 操作符作用相同，区别在于 <code>c</code> 操作符参数需要传入，<code>\x93</code> 操作符使用栈顶两个元素作为参数，如这里 <code>\x8c\x08settings\x94\x8c\x04User\x94\x93\x94</code> 即获取 <code>settings.User</code></p>
+</li>
+<li>
+<p><code>\x81</code> 与 <code>o</code> 和 <code>i</code> 作用相同，可用于创建类的实例，但是调用 <code>__new__</code> 方法创建，使用栈顶两个参数，栈顶参数为所调用参数，需要为 tuple，后一个参数为一个类对象，如这里 <code>\x8c\x08settings\x94\x8c\x04User\x94\x93\x94)\x81\x94</code> 即调用了 <code>settings.User.__new__()</code> 创建了一个 <code>settings.User</code> 的实例</p>
+</li>
+<li>
+<p><code>}\x94(\x8c\x08password\x94h\x05\x8c\x03msg\x94h\x06ub</code> 大部分用到的操作码都介绍过，这里 <code>h\x05</code> 和 <code>h\x06</code> 获取到的就是前边刚放入的 ‘password’ 和 ‘msg’ 字符串，这一部分即创建一个 dict： <code>{'password': 'password', 'msg': 'msg'}</code>，然后作为参数通过 <code>b</code> 操作码更新前面创建的实例</p>
+</li>
+</ul>
+<p>分析到这里各部分的作用都已经很清晰了，而我们要做的很简单，就是把最后创建的 dict 中两个值 <code>h\x05</code> <code>h\x06</code> 分别换为 <code>settings.ADMIN_PASSWORD</code> 和 <code>settings.SECRET_KEY</code>，即最后创建的 dict 为 <code>{'password': settings.ADMIN_PASSWORD, 'msg': settings.SECRET_KEY}</code></p>
+<p>这里我选择用了比较 V4 的方法获取，以获取 <code>settings.ADMIN_PASSWORD</code> 为例，我使用了 <code>\x8c\x08settings\x94\x8c\x0eADMIN_PASSWORD\x94\x93\x94</code> （其实就是把获取 <code>settings.User</code> 时候的操作码拿过来改一下</p>
+<p>最终得到非常 V4 的序列化数据如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">\x80\x04\x952\x00\x00\x00\x00\x00\x00\x00\x8c\x08settings\x94\x8c\x04User\x94\x93\x94)\x81\x94}\x94(\x8c\x08password\x94\x8c\x08settings\x94\x8c\x0eADMIN_PASSWORD\x94\x93\x94\x8c\x03msg\x94\x8c\x08settings\x94\x8c\nSECRET_KEY\x94\x93\x94ub.
+</code></pre></td></tr></table>
+</div>
+</div><p>base64 encode 一下传进去就可以拿到 SECRET_KEY 了</p>
+<h3 id="session-伪造">session 伪造</h3>
+<p>这一步就非常简单了，用这个库 <a href="https://github.com/noraj/flask-session-cookie-manager" rel="noopener noreffer" target="_blank">Flask Session Cookie Decoder/Encoder</a> 解一下 Cookie 中的 session 得到</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">{"logged_in":0,"name":"Anonymous"}
+</code></pre></td></tr></table>
+</div>
+</div><p>修改成如下数据然后再用上述库和上一步得到的 SECRET_KEY 得到新的 session 值</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">{"logged_in":1,"name":"admin"}
+</code></pre></td></tr></table>
+</div>
+</div><p>替换掉 Cookie 中的 session 访问 <code>/index</code> 即可得到 flag</p>
+<h2 id="0x02-fix">0x02 Fix</h2>
+<p>这题 Fix 的思路就非常简单了</p>
+<p>源码的第 19~20 行是对反序列化进行限制的主要部分，限制了 <code>module</code> 和 <code>name</code>，只需要在 if 里加一个条件过滤掉 <code>SECRET_KEY</code> 和 <code>ADMIN_PASSWORD</code> 即可，即将第 19 行改为如下代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">if</span> <span class="n">module</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'settings'</span><span class="p">]</span> <span class="ow">and</span> <span class="s2">"__"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'SECRET_KEY'</span><span class="p">,</span> <span class="s1">'ADMIN_PASSWORD'</span><span class="p">]:</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="0x03-后记">0x03 后记</h2>
+<p>这次比赛感觉 Web 题整体偏难，全场也只有 Web1 和 Web3 有解，可能是因为断网的原因吧，网一断确实就不会做题了（x</p>
+<p>但是整体比赛体验还是很不错的，除了泥电宾馆会议室那个破空调是真的不行，打个比赛差点没中暑，强烈吐槽</p>
+<p>哦，还有零食太少了，建议决赛来个零食大礼包</p>
+</div><div class="post-footer" id="post-footer">
+<div class="post-info">
+<div class="post-info-line">
+<div class="post-info-mod">
+<span>更新于 2021-06-10</span>
+</div>
+<div class="post-info-license"></div>
+</div>
+<div class="post-info-line">
+<div class="post-info-md"><span>
+<a class="link-to-markdown" href="/posts/ciscn-2021-ws-web3/index.md" target="_blank">阅读原始文档</a>
+</span></div>
+<div class="post-info-share">
+<span></span>
+</div>
+</div>
+</div>
+<div class="post-info-more">
+<section class="post-tags"><i class="fas fa-tags fa-fw"></i> <a href="/tags/ciscn-2021/">CISCN 2021</a>, <a href="/tags/web-%E5%AE%89%E5%85%A8/">Web 安全</a>, <a href="/tags/python/">Python</a>, <a href="/tags/flask/">Flask</a>, <a href="/tags/pickle-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">pickle 反序列化</a></section>
+<section>
+<span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span> | <span><a href="/">主页</a></span>
+</section>
+</div>
+<div class="post-nav"><a class="prev" href="/posts/php-mt_rand-break/" rel="prev" title="还原 PHP mt_rand 种子"><i class="fas fa-angle-left fa-fw"></i>还原 PHP mt_rand 种子</a>
+<a class="next" href="/posts/python-pickle-unserialize/" rel="next" title="Python pickle 反序列化安全简述">Python pickle 反序列化安全简述<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"><div class="comment" id="valine"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
+            </noscript></div></article></div>
+</main><footer class="footer">
+<div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" rel="noopener noreffer" target="_blank" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" rel="noopener noreffer" target="_blank" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+</div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2021</span><span class="author" itemprop="copyrightHolder"> <a href="/" target="_blank">X5tar</a></span> | <span class="license"><a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license external nofollow noopener noreffer" target="_blank">CC BY-SA 4.0</a></span></div>
+</div>
+</footer></div>
+<div id="fixed-buttons"><a class="fixed-button" href="#" id="back-to-top" title="回到顶部">
+<i class="fas fa-arrow-up fa-fw"></i>
+</a><a class="fixed-button" href="#" id="view-comments" title="查看评论">
+<i class="fas fa-comment fa-fw"></i>
+</a>
+</div><link href="/lib/valine/valine.min.css" rel="stylesheet"/><link href="/lib/lightgallery/lightgallery.min.css" rel="stylesheet"/><script src="/lib/valine/Valine.min.js" type="text/javascript"></script><script src="/lib/smooth-scroll/smooth-scroll.min.js" type="text/javascript"></script><script src="/lib/autocomplete/autocomplete.min.js" type="text/javascript"></script><script src="/lib/algoliasearch/algoliasearch-lite.umd.min.js" type="text/javascript"></script><script src="/lib/lazysizes/lazysizes.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lightgallery.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-thumbnail.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-zoom.min.js" type="text/javascript"></script><script src="/lib/clipboard/clipboard.min.js" type="text/javascript"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{"valine":{"appId":"iAbQo5y0XlBlUP9F0K3Tyx8f-MdYXbMMI","appKey":"ML5YMAAFe45gCJawVJcUkrg0","el":"#valine","emojiCDN":"https://cdn.jsdelivr.net/npm/emoji-datasource-google@5.0.1/img/google/64/","emojiMaps":{"100":"1f4af.png","alien":"1f47d.png","anger":"1f4a2.png","angry":"1f620.png","anguished":"1f627.png","astonished":"1f632.png","black_heart":"1f5a4.png","blue_heart":"1f499.png","blush":"1f60a.png","bomb":"1f4a3.png","boom":"1f4a5.png","broken_heart":"1f494.png","brown_heart":"1f90e.png","clown_face":"1f921.png","cold_face":"1f976.png","cold_sweat":"1f630.png","confounded":"1f616.png","confused":"1f615.png","cry":"1f622.png","crying_cat_face":"1f63f.png","cupid":"1f498.png","dash":"1f4a8.png","disappointed":"1f61e.png","disappointed_relieved":"1f625.png","dizzy":"1f4ab.png","dizzy_face":"1f635.png","drooling_face":"1f924.png","exploding_head":"1f92f.png","expressionless":"1f611.png","face_vomiting":"1f92e.png","face_with_cowboy_hat":"1f920.png","face_with_hand_over_mouth":"1f92d.png","face_with_head_bandage":"1f915.png","face_with_monocle":"1f9d0.png","face_with_raised_eyebrow":"1f928.png","face_with_rolling_eyes":"1f644.png","face_with_symbols_on_mouth":"1f92c.png","face_with_thermometer":"1f912.png","fearful":"1f628.png","flushed":"1f633.png","frowning":"1f626.png","ghost":"1f47b.png","gift_heart":"1f49d.png","green_heart":"1f49a.png","grimacing":"1f62c.png","grin":"1f601.png","grinning":"1f600.png","hankey":"1f4a9.png","hear_no_evil":"1f649.png","heart":"2764-fe0f.png","heart_decoration":"1f49f.png","heart_eyes":"1f60d.png","heart_eyes_cat":"1f63b.png","heartbeat":"1f493.png","heartpulse":"1f497.png","heavy_heart_exclamation_mark_ornament":"2763-fe0f.png","hole":"1f573-fe0f.png","hot_face":"1f975.png","hugging_face":"1f917.png","hushed":"1f62f.png","imp":"1f47f.png","innocent":"1f607.png","japanese_goblin":"1f47a.png","japanese_ogre":"1f479.png","joy":"1f602.png","joy_cat":"1f639.png","kiss":"1f48b.png","kissing":"1f617.png","kissing_cat":"1f63d.png","kissing_closed_eyes":"1f61a.png","kissing_heart":"1f618.png","kissing_smiling_eyes":"1f619.png","laughing":"1f606.png","left_speech_bubble":"1f5e8-fe0f.png","love_letter":"1f48c.png","lying_face":"1f925.png","mask":"1f637.png","money_mouth_face":"1f911.png","nauseated_face":"1f922.png","nerd_face":"1f913.png","neutral_face":"1f610.png","no_mouth":"1f636.png","open_mouth":"1f62e.png","orange_heart":"1f9e1.png","partying_face":"1f973.png","pensive":"1f614.png","persevere":"1f623.png","pleading_face":"1f97a.png","pouting_cat":"1f63e.png","purple_heart":"1f49c.png","rage":"1f621.png","relaxed":"263a-fe0f.png","relieved":"1f60c.png","revolving_hearts":"1f49e.png","right_anger_bubble":"1f5ef-fe0f.png","robot_face":"1f916.png","rolling_on_the_floor_laughing":"1f923.png","scream":"1f631.png","scream_cat":"1f640.png","see_no_evil":"1f648.png","shushing_face":"1f92b.png","skull":"1f480.png","skull_and_crossbones":"2620-fe0f.png","sleeping":"1f634.png","sleepy":"1f62a.png","slightly_frowning_face":"1f641.png","slightly_smiling_face":"1f642.png","smile":"1f604.png","smile_cat":"1f638.png","smiley":"1f603.png","smiley_cat":"1f63a.png","smiling_face_with_3_hearts":"1f970.png","smiling_imp":"1f608.png","smirk":"1f60f.png","smirk_cat":"1f63c.png","sneezing_face":"1f927.png","sob":"1f62d.png","space_invader":"1f47e.png","sparkling_heart":"1f496.png","speak_no_evil":"1f64a.png","speech_balloon":"1f4ac.png","star-struck":"1f929.png","stuck_out_tongue":"1f61b.png","stuck_out_tongue_closed_eyes":"1f61d.png","stuck_out_tongue_winking_eye":"1f61c.png","sunglasses":"1f60e.png","sweat":"1f613.png","sweat_drops":"1f4a6.png","sweat_smile":"1f605.png","thinking_face":"1f914.png","thought_balloon":"1f4ad.png","tired_face":"1f62b.png","triumph":"1f624.png","two_hearts":"1f495.png","unamused":"1f612.png","upside_down_face":"1f643.png","weary":"1f629.png","white_frowning_face":"2639-fe0f.png","white_heart":"1f90d.png","wink":"1f609.png","woozy_face":"1f974.png","worried":"1f61f.png","yawning_face":"1f971.png","yellow_heart":"1f49b.png","yum":"1f60b.png","zany_face":"1f92a.png","zipper_mouth_face":"1f910.png","zzz":"1f4a4.png"},"enableQQ":null,"highlight":true,"lang":"zh-cn","placeholder":"你的评论 ...","recordIP":null,"visitor":null}},"lightGallery":{"actualSize":false,"exThumbImage":"data-thumbnail","hideBarsDelay":2000,"selector":".lightgallery","speed":400,"thumbContHeight":80,"thumbWidth":80,"thumbnail":true},"search":{"algoliaAppID":"3M3B3KM4LG","algoliaIndex":"blog","algoliaSearchKey":"babfa85706a3a4a0025db8ff2fdf3525","highlightTag":null,"maxResultLength":null,"noResultsFound":"没有找到结果","snippetLength":null,"type":"algolia"}};</script><script src="/js/theme.min.js" type="text/javascript"></script><script type="text/javascript">
+            window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());
+            gtag('config', 'UA-160185073-2');
+        </script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-160185073-2" type="text/javascript"></script></body>
+</html>

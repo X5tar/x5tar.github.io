@@ -1,0 +1,22 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>pickle 反序列化 - 标签 - X5tar&#39;s Blog</title>
+        <link>https://x5tar.com/tags/pickle-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/</link>
+        <description>pickle 反序列化 - 标签 - X5tar&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>x5tar@qq.com (X5tar)</managingEditor>
+            <webMaster>x5tar@qq.com (X5tar)</webMaster><lastBuildDate>Thu, 10 Jun 2021 17:01:50 &#43;0800</lastBuildDate><atom:link href="https://x5tar.com/tags/pickle-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" rel="self" type="application/rss+xml" /><item>
+    <title>Python pickle 反序列化安全简述</title>
+    <link>https://x5tar.com/posts/python-pickle-unserialize/</link>
+    <pubDate>Thu, 10 Jun 2021 17:01:50 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://x5tar.com/posts/python-pickle-unserialize/</guid>
+    <description><![CDATA[0x00 前言 最近的比赛遇到过好几次 pickle 反序列化，而且每次都有不同的条件和利用方法，不像 PHP 反序列化有相对固定的操作，就打算简单的总结一下，也方便自己以]]></description>
+</item><item>
+    <title>CISCN 2021 西南分区赛 Web3 Break&amp;Fix WriteUp</title>
+    <link>https://x5tar.com/posts/ciscn-2021-ws-web3/</link>
+    <pubDate>Thu, 10 Jun 2021 16:41:40 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://x5tar.com/posts/ciscn-2021-ws-web3/</guid>
+    <description><![CDATA[0x00 前言 一次体验还可以的线下，一共就出了两个 Web 题还都是一血就很开心，由于 Web1 过于简单 (sqlmap 一把梭了)，而 Web2 由于前半部分没有做出来，仅仅对其后半部分 (]]></description>
+</item></channel>
+</rss>

