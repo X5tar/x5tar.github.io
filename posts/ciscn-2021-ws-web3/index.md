@@ -121,7 +121,7 @@ print(pickle.dumps(User()))
 
   `\x8c\x04User\x94` `\x8c\x08password\x94` `\x8c\x03msg\x94` 同理
 
-  > pickle 会自动将栈中变量放入 memo 中，也可以不进行 `\x94` 操作
+  > pickle 默认将栈中变量放入 memo 中，也可以不放
 
 - `\x93` 与 `c` 操作符作用相同，区别在于 `c` 操作符参数需要传入，`\x93` 操作符使用栈顶两个元素作为参数，如这里 `\x8c\x08settings\x94\x8c\x04User\x94\x93\x94` 即获取 `settings.User`
 
