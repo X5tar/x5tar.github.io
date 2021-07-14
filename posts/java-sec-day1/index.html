@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="noodp" name="robots"/>
+<meta content="IE=edge, chrome=1" http-equiv="X-UA-Compatible"/>
+<title>Java 安全学习 Day1 -- 基础知识 - X5tar's Blog</title><meta content="" name="Description"/><meta content="Java 安全学习 Day1 -- 基础知识" property="og:title"/>
+<meta content="0x00 前言 这个暑假一定学 Java – 🌟 0x01 反射 反射式编程是指计算机程序在运行时（runtime）可以访问、检测和修改它本身状态或行为的一种能力。 在 Java 中，反" property="og:description"/>
+<meta content="article" property="og:type"/>
+<meta content="https://x5tar.com/posts/java-sec-day1/" property="og:url"/><meta content="posts" property="article:section"/>
+<meta content="2021-07-14T18:14:15+08:00" property="article:published_time"/>
+<meta content="2021-07-14T18:14:15+08:00" property="article:modified_time"/>
+<meta content="summary" name="twitter:card"/>
+<meta content="Java 安全学习 Day1 -- 基础知识" name="twitter:title"/>
+<meta content="0x00 前言 这个暑假一定学 Java – 🌟 0x01 反射 反射式编程是指计算机程序在运行时（runtime）可以访问、检测和修改它本身状态或行为的一种能力。 在 Java 中，反" name="twitter:description"/>
+<meta content="X5tar's Blog" name="application-name"/>
+<meta content="X5tar's Blog" name="apple-mobile-web-app-title"/><link href="/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+<link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+<link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/><link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/><link href="/site.webmanifest" rel="manifest"/><link href="https://x5tar.com/posts/java-sec-day1/" rel="canonical"/><link href="https://x5tar.com/posts/python-pickle-unserialize/" rel="prev"/><link href="/lib/normalize/normalize.min.css" rel="stylesheet"/><link href="/css/style.min.css" rel="stylesheet"/><link href="/lib/fontawesome-free/all.min.css" rel="stylesheet"/><link href="/lib/animate/animate.min.css" rel="stylesheet"/><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Java 安全学习 Day1 -- 基础知识",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/x5tar.com\/posts\/java-sec-day1\/"
+        },"genre": "posts","keywords": "Java","wordcount":  1995 ,
+        "url": "https:\/\/x5tar.com\/posts\/java-sec-day1\/","datePublished": "2021-07-14T18:14:15+08:00","dateModified": "2021-07-14T18:14:15+08:00","publisher": {
+            "@type": "Organization",
+            "name": "X5tar"},"author": {
+                "@type": "Person",
+                "name": "X5tar"
+            },"description": ""
+    }
+    </script></head>
+<body header-desktop="" header-mobile=""><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : '' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+<div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu">
+<div class="menu-inner"><a class="menu-item" href="/posts/"> Posts </a><a class="menu-item" href="/tags/"> Tags </a><a class="menu-item" href="/categories/"> Categories </a><a class="menu-item" href="/friends/"> Friends </a><a class="menu-item" href="/about/"> About </a><span class="menu-item delimiter"></span><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a>
+</div>
+</div>
+</div>
+</header><header class="mobile" id="header-mobile">
+<div class="header-container">
+<div class="header-wrapper">
+<div class="header-title">
+<a href="/" title="X5tar's Blog">X5tar's Blog</a>
+</div>
+<div class="menu-toggle" id="menu-toggle-mobile">
+<span></span><span></span><span></span>
+</div>
+</div>
+<div class="menu" id="menu-mobile"><a class="menu-item" href="/posts/" title="">Posts</a><a class="menu-item" href="/tags/" title="">Tags</a><a class="menu-item" href="/categories/" title="">Categories</a><a class="menu-item" href="/friends/" title="">Friends</a><a class="menu-item" href="/about/" title="">About</a><a class="menu-item theme-switch" href="javascript:void(0);" title="切换主题">
+<i class="fas fa-adjust fa-fw"></i>
+</a></div>
+</div>
+</header>
+<div class="search-dropdown desktop">
+<div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+<div id="search-dropdown-mobile"></div>
+</div>
+<main class="main">
+<div class="container"><div class="toc" id="toc-auto">
+<h2 class="toc-title">目录</h2>
+<div class="toc-content" id="toc-content-auto"></div>
+</div><article class="page single"><h1 class="single-title animated flipInX">Java 安全学习 Day1 -- 基础知识</h1><div class="post-meta">
+<div class="post-meta-line"><span class="post-author"><a class="author" href="/" rel="author" title="Author"><i class="fas fa-user-circle fa-fw"></i>X5tar</a></span> <span class="post-category">收录于 <a href="/categories/security/"><i class="far fa-folder fa-fw"></i>Security</a></span></div>
+<div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i> <time datetime="2021-07-14">2021-07-14</time> <i class="fas fa-pencil-alt fa-fw"></i> 约 1995 字 
+                <i class="far fa-clock fa-fw"></i> 预计阅读 4 分钟 </div>
+</div><div class="details toc" id="toc-static" kept="">
+<div class="details-summary toc-title">
+<span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span>
+</div>
+<div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+<ul>
+<li><a href="#0x00-前言">0x00 前言</a></li>
+<li><a href="#0x01-反射">0x01 反射</a>
+<ul>
+<li><a href="#class-类">Class 类</a></li>
+<li><a href="#field-类">Field 类</a></li>
+<li><a href="#method-类">Method 类</a></li>
+<li><a href="#通过-class-实例创建类的实例">通过 Class 实例创建类的实例</a></li>
+<li><a href="#动态代理">动态代理</a></li>
+</ul>
+</li>
+<li><a href="#0x02-classloader-机制">0x02 ClassLoader 机制</a>
+<ul>
+<li><a href="#classloader-类">ClassLoader 类</a></li>
+</ul>
+</li>
+<li><a href="#0x03-注解">0x03 注解</a></li>
+<li><a href="#0x04-序列化与反序列化">0x04 序列化与反序列化</a></li>
+<li><a href="#0x05-总结与展望误">0x05 总结与展望（误</a></li>
+</ul>
+</nav></div>
+</div><div class="content" id="content"><h2 id="0x00-前言">0x00 前言</h2>
+<p>这个暑假一定学 Java  –  🌟</p>
+<h2 id="0x01-反射">0x01 反射</h2>
+<p>反射式编程是指计算机程序在运行时（runtime）可以访问、检测和修改它本身状态或行为的一种能力。</p>
+<p>在 Java 中，反射指在运行期间得到一个对象（所属的类）的所有信息，并对对象的属性和方法进行调用等功能。</p>
+<h3 id="class-类">Class 类</h3>
+<p>除了八种基本类型外，Java 中其它全部类型都是 class（包括 interface，下同）。</p>
+<p>JVM 在程序运行过程中会将 class 动态加载进内存中，而每一个加载进内存的 class 本质上都是 <code>java.lang.Class</code> 类型的一个实例，该实例中包含了 class 的所有信息，通过获取该实例即可达到动态调用对象属性和方法的功能。</p>
+<p>获取 Class 实例一般有三种方法：</p>
+<ol>
+<li>
+<p>class 静态变量</p>
+<p>JVM 中每一个已经加载的类，都会有一个名为 <code>class</code> 的静态变量，该变量储存了对应的 Class 实例。</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;class 静态变量&lt;/h2&gt;&lt;p&gt;class&lt;/p&gt;" data-thumbnail="/posts/java-sec-day1/class.png" href="/posts/java-sec-day1/class.png" title="class">
+<img alt="/posts/java-sec-day1/class.png" class="lazyload" data-sizes="auto" data-src="class.png" data-srcset="/posts/java-sec-day1/class.png, class.png 1.5x, /posts/java-sec-day1/class.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">class 静态变量</figcaption>
+</figure></p>
+</li>
+<li>
+<p>getClass 方法</p>
+<p>JVM 中每一个类的实例对象，都会有一个名为 <code>getClass</code> 的方法，通过调用该方法可以得到该类对应的 Class 实例。</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;getClass 方法&lt;/h2&gt;&lt;p&gt;getClass&lt;/p&gt;" data-thumbnail="/posts/java-sec-day1/getClass.png" href="/posts/java-sec-day1/getClass.png" title="getClass">
+<img alt="/posts/java-sec-day1/getClass.png" class="lazyload" data-sizes="auto" data-src="getClass.png" data-srcset="/posts/java-sec-day1/getClass.png, getClass.png 1.5x, /posts/java-sec-day1/getClass.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">getClass 方法</figcaption>
+</figure></p>
+</li>
+<li>
+<p>Class.forName 方法</p>
+<p><code>java.lang.Class</code> 类型有一个静态方法 <code>forName</code>，该方法接收一个 <code>String</code> 参数，参数为一个 class 的完整类名（如 <code>java.lang.String</code>），返回该类名对应的 Class 实例。</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;Class.forName 方法&lt;/h2&gt;&lt;p&gt;forName.png&lt;/p&gt;" data-thumbnail="/posts/java-sec-day1/forName.png" href="/posts/java-sec-day1/forName.png" title="forName.png">
+<img alt="/posts/java-sec-day1/forName.png" class="lazyload" data-sizes="auto" data-src="forName.png" data-srcset="/posts/java-sec-day1/forName.png, forName.png 1.5x, /posts/java-sec-day1/forName.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">Class.forName 方法</figcaption>
+</figure></p>
+</li>
+</ol>
+<p>Class 类提供了以下方法用于获取 class 的基本信息（OpenJDK Runtime Environment AdoptOpenJDK-11.0.11+9）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">native</span> <span class="kt">boolean</span> <span class="nf">isInstance</span><span class="o">(</span><span class="n">Object</span> <span class="n">obj</span><span class="o">);</span>
+<span class="kd">public</span> <span class="kd">native</span> <span class="kt">boolean</span> <span class="nf">isAssignableFrom</span><span class="o">(</span><span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">cls</span><span class="o">);</span>
+<span class="kd">public</span> <span class="kd">native</span> <span class="kt">boolean</span> <span class="nf">isInterface</span><span class="o">();</span>
+<span class="kd">public</span> <span class="kd">native</span> <span class="kt">boolean</span> <span class="nf">isArray</span><span class="o">();</span>
+<span class="kd">public</span> <span class="kd">native</span> <span class="kt">boolean</span> <span class="nf">isPrimitive</span><span class="o">();</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isAnnotation</span><span class="o">();</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isSynthetic</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">ClassLoader</span> <span class="nf">getClassLoader</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Module</span> <span class="nf">getModule</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">TypeVariable</span><span class="o">&lt;</span><span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;&gt;[]</span> <span class="nf">getTypeParameters</span><span class="o">();</span>
+<span class="kd">public</span> <span class="kd">native</span> <span class="n">Class</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">T</span><span class="o">&gt;</span> <span class="nf">getSuperclass</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Type</span> <span class="nf">getGenericSuperclass</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Package</span> <span class="nf">getPackage</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">String</span> <span class="nf">getPackageName</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Class</span><span class="o">&lt;?&gt;[]</span> <span class="n">getInterfaces</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Type</span><span class="o">[]</span> <span class="nf">getGenericInterfaces</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">getComponentType</span><span class="o">();</span>
+<span class="kd">public</span> <span class="kd">native</span> <span class="kt">int</span> <span class="nf">getModifiers</span><span class="o">();</span>
+<span class="kd">public</span> <span class="kd">native</span> <span class="n">Object</span><span class="o">[]</span> <span class="nf">getSigners</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Method</span> <span class="nf">getEnclosingMethod</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Constructor</span><span class="o">&lt;?&gt;</span> <span class="n">getEnclosingConstructor</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">getDeclaringClass</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">getEnclosingClass</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">String</span> <span class="nf">getSimpleName</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">String</span> <span class="nf">getTypeName</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">String</span> <span class="nf">getCanonicalName</span><span class="o">();</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isAnonymousClass</span><span class="o">();</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isLocalClass</span><span class="o">();</span>
+<span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isMemberClass</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Class</span><span class="o">&lt;?&gt;[]</span> <span class="n">getClasses</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Field</span><span class="o">[]</span> <span class="nf">getFields</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Method</span><span class="o">[]</span> <span class="nf">getMethods</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Constructor</span><span class="o">&lt;?&gt;[]</span> <span class="n">getConstructors</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Field</span> <span class="nf">getField</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">);</span>
+<span class="kd">public</span> <span class="n">Method</span> <span class="nf">getMethod</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;?&gt;...</span> <span class="n">parameterTypes</span><span class="o">);</span>
+<span class="kd">public</span> <span class="n">Constructor</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">getConstructor</span><span class="o">(</span><span class="n">Class</span><span class="o">&lt;?&gt;...</span> <span class="n">parameterTypes</span><span class="o">);</span>
+<span class="kd">public</span> <span class="n">Class</span><span class="o">&lt;?&gt;[]</span> <span class="n">getDeclaredClasses</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Field</span><span class="o">[]</span> <span class="nf">getDeclaredFields</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Method</span><span class="o">[]</span> <span class="nf">getDeclaredMethods</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Constructor</span><span class="o">&lt;?&gt;[]</span> <span class="n">getDeclaredConstructors</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Field</span> <span class="nf">getDeclaredField</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">);</span>
+<span class="kd">public</span> <span class="n">Method</span> <span class="nf">getDeclaredMethod</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="n">Class</span><span class="o">&lt;?&gt;...</span> <span class="n">parameterTypes</span><span class="o">);</span>
+<span class="kd">public</span> <span class="n">Constructor</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="nf">getDeclaredConstructor</span><span class="o">(</span><span class="n">Class</span><span class="o">&lt;?&gt;...</span> <span class="n">parameterTypes</span><span class="o">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>一些常用方法的使用如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-plain" data-lang="plain">String.class.isInstance("")
+true
+
+String.class.isInterface()
+false
+
+String.class.isInterface()
+false
+
+String.class.getName()
+java.lang.String
+
+String.class.getSimpleName()
+String
+
+String.class.getModule()
+module java.base
+
+String.class.getPackage()
+package java.lang
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="field-类">Field 类</h3>
+<p>通过 Class 实例的 <code>getField</code> 和 <code>getDeclaredField</code> 等方法，可以获取字段对应的 Field 实例，用于获取字段的基本信息。</p>
+<p>Field 类提供了以下方法用于获取字段的基本信息（OpenJDK Runtime Environment AdoptOpenJDK-11.0.11+9）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">getDeclaringClass</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">();</span>
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">getModifiers</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">getType</span><span class="o">();</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>一些常用方法的使用如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-plain" data-lang="plain">class Test {
+    public String a;
+    public int b;
+}
+
+Test.class.getField("a")
+public java.lang.String Test.a
+
+Test.class.getField("a").getName()
+a
+
+Test.class.getField("a").getType()
+class java.lang.String
+
+Test.class.getField("a").getDeclaringClass()
+class Test
+</code></pre></td></tr></table>
+</div>
+</div><p>Field 类还提供了一些方法用于操作实例中的字段</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="n">Object</span> <span class="nf">get</span><span class="o">(</span><span class="n">Object</span> <span class="n">obj</span><span class="o">);</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">set</span><span class="o">(</span><span class="n">Object</span> <span class="n">obj</span><span class="o">,</span> <span class="n">Object</span> <span class="n">value</span><span class="o">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="method-类">Method 类</h3>
+<p>通过 Class 实例的 <code>getMethod</code> 和 <code>getDeclaredMehtod</code> 等方法，可以获取方法对应的 Method 实例，用于获取方法的基本信息。</p>
+<p>Method 类提供了以下方法用于获取方法的基本信息（OpenJDK Runtime Environment AdoptOpenJDK-11.0.11+9）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">getDeclaringClass</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">String</span> <span class="nf">getName</span><span class="o">();</span>
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">getModifiers</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">getReturnType</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Class</span><span class="o">&lt;?&gt;[]</span> <span class="n">getExceptionTypes</span><span class="o">();</span>
+<span class="kd">public</span> <span class="kt">int</span> <span class="nf">getParameterCount</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Class</span><span class="o">&lt;?&gt;[]</span> <span class="n">getParameterTypes</span><span class="o">();</span>
+<span class="kd">public</span> <span class="n">Object</span> <span class="nf">getDefaultValue</span><span class="o">();</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>一些常用方法的使用如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-plain" data-lang="plain">class Test {
+    public String a(String b) {
+        return b;
+    }
+}
+
+Test.class.getMethod("a", String.class)
+public java.lang.String Test.a(java.lang.String)
+
+Test.class.getMethod("a", String.class).getName()
+a
+
+Test.class.getMethod("a", String.class).getReturnType()
+class java.lang.String
+
+Test.class.getMethod("a", String.class).getParameterCount()
+1
+
+Test.class.getMethod("a", String.class).getParameterTypes()
+Class[1] { class java.lang.String }
+
+Test.class.getMethod("a", String.class).getDeclaringClass()
+class Test
+</code></pre></td></tr></table>
+</div>
+</div><p>Field 类还提供了方法用于至今调用实例的方法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="n">Object</span> <span class="nf">invoke</span><span class="o">(</span><span class="n">Object</span> <span class="n">obj</span><span class="o">,</span> <span class="n">Object</span><span class="o">...</span> <span class="n">args</span><span class="o">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="通过-class-实例创建类的实例">通过 Class 实例创建类的实例</h3>
+<ol>
+<li>
+<p><code>newInstance</code> 方法</p>
+<p>该方法只能调用类的无参数 public 构造方法创建新的实例。</p>
+</li>
+<li>
+<p>通过 <code>getConstructor</code> 获取构造方法</p>
+<p>通过 <code>getConstructor</code> 获取类的其它构造方法，其参数为构造方法参数类型对应的 Class 实例，再调用构造方法的 <code>newInstance</code> 方法创建实例。</p>
+<p><figure><a class="lightgallery" data-sub-html="&lt;h2&gt;通过 getConstructor 获取构造方法&lt;/h2&gt;&lt;p&gt;getConstructor&lt;/p&gt;" data-thumbnail="/posts/java-sec-day1/getConstructor.png" href="/posts/java-sec-day1/getConstructor.png" title="getConstructor">
+<img alt="/posts/java-sec-day1/getConstructor.png" class="lazyload" data-sizes="auto" data-src="getConstructor.png" data-srcset="/posts/java-sec-day1/getConstructor.png, getConstructor.png 1.5x, /posts/java-sec-day1/getConstructor.png 2x" src="/svg/loading.min.svg"/>
+</a><figcaption class="image-caption">通过 getConstructor 获取构造方法</figcaption>
+</figure></p>
+</li>
+</ol>
+<h3 id="动态代理">动态代理</h3>
+<p>正常情况下，Java 不允许直接创建一个接口的实例，而是必须创建一个类实现该接口，再创建该类的实例。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">interface</span> <span class="nc">In</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">a</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="kd">static</span> <span class="kd">class</span> <span class="nc">Test</span> <span class="kd">implements</span> <span class="n">In</span> <span class="o">{</span>
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">a</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">"Test"</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">In</span> <span class="n">in</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Test</span><span class="o">();</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">in</span><span class="o">.</span><span class="na">a</span><span class="o">());</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>而 Java 标准库提供了动态代理机制，不需要提前编写实现类，而是在运行期间动态创建接口的实例，上述代码可以用以下动态代理的方法实现</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">interface</span> <span class="nc">In</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">a</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">InvocationHandler</span> <span class="n">handler</span> <span class="o">=</span> <span class="k">new</span> <span class="n">InvocationHandler</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nd">@Override</span>
+        <span class="kd">public</span> <span class="n">Object</span> <span class="nf">invoke</span><span class="o">(</span><span class="n">Object</span> <span class="n">proxy</span><span class="o">,</span> <span class="n">Method</span> <span class="n">method</span><span class="o">,</span> <span class="n">Object</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">method</span><span class="o">.</span><span class="na">getName</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="s">"a"</span><span class="o">))</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="s">"Test"</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">};</span>
+    <span class="n">In</span> <span class="n">in</span> <span class="o">=</span> <span class="o">(</span><span class="n">In</span><span class="o">)</span> <span class="n">Proxy</span><span class="o">.</span><span class="na">newProxyInstance</span><span class="o">(</span>
+        <span class="n">In</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getClassLoader</span><span class="o">(),</span>
+        <span class="k">new</span> <span class="n">Class</span><span class="o">[]</span> <span class="o">{</span> <span class="n">In</span><span class="o">.</span><span class="na">class</span> <span class="o">},</span>
+        <span class="n">handler</span>
+    <span class="o">);</span>
+    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">in</span><span class="o">.</span><span class="na">a</span><span class="o">());</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>动态代理机制在运行期间动态创建 class 字节码并加载进内存，以起到类似创建接口实例的效果。</p>
+<h2 id="0x02-classloader-机制">0x02 ClassLoader 机制</h2>
+<p>JVM 在类初始化时，会使用 <code>java.lang.ClassLoader</code> 加载 class 字节码，以创建 Class 实例将 class 加载进内存。</p>
+<p>JVM 中顶层类加载器有 <code>Bootstrap ClassLoader</code>、<code>Extension ClassLoader</code> 和 <code>App ClassLoader</code>，默认情况下，用户创建的类会使用 <code>App ClassLoader</code> 进行加载。</p>
+<h3 id="classloader-类">ClassLoader 类</h3>
+<p>ClassLoader 类有以下核心方法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">loadClass</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">);</span>
+<span class="kd">protected</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">findClass</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">);</span>
+<span class="kd">protected</span> <span class="kd">final</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">findLoadedClass</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">);</span>
+<span class="kd">protected</span> <span class="kd">final</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">defineClass</span><span class="o">(</span><span class="n">String</span> <span class="n">name</span><span class="o">,</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">b</span><span class="o">,</span> <span class="kt">int</span> <span class="n">off</span><span class="o">,</span> <span class="kt">int</span> <span class="n">len</span><span class="o">,</span> <span class="n">ProtectionDomain</span> <span class="n">protectionDomain</span><span class="o">);</span>
+<span class="kd">protected</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">resolveClass</span><span class="o">(</span><span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">c</span><span class="o">);</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>其中 <code>loadClass</code> 方法通过类的完整名称加载类，与 Class 类中的 <code>forName</code> 方法类似。</p>
+<h2 id="0x03-注解">0x03 注解</h2>
+<p>注解是放在 Java 源码的类、方法、字段、参数前的一种特殊“注释“，会被放入 class 字节码中，可以在运行时获取并处理注解。</p>
+<h2 id="0x04-序列化与反序列化">0x04 序列化与反序列化</h2>
+<p>如果一个类实现了 <code>java.io.Serializable</code> 接口，那么它的实例就是可序列化的，可以通过 <code>ObjectOutputStream</code> 类的 <code>writeObject</code> 方法实现序列化，通过 <code>ObjectInputStream</code> 类的 <code>readObject</code> 方法实现反序列化。</p>
+<p>一个类的实例在进行反序列化时，会调用 <code>java.io.Serializable</code> 接口的 <code>readObject</code> 方法，如果该方法中存在可以利用的函数，即存在反序列化漏洞。</p>
+<h2 id="0x05-总结与展望误">0x05 总结与展望（误</h2>
+<p>后续应该就是分析一下 <a href="https://github.com/frohoff/ysoserial" rel="noopener noreffer" target="_blank">ysoserial</a> 里的各种链，然后复现一下常见框架的 CVE，希望不咕（</p>
+</div><div class="post-footer" id="post-footer">
+<div class="post-info">
+<div class="post-info-line">
+<div class="post-info-mod">
+<span>更新于 2021-07-14</span>
+</div>
+<div class="post-info-license"></div>
+</div>
+<div class="post-info-line">
+<div class="post-info-md"><span>
+<a class="link-to-markdown" href="/posts/java-sec-day1/index.md" target="_blank">阅读原始文档</a>
+</span></div>
+<div class="post-info-share">
+<span></span>
+</div>
+</div>
+</div>
+<div class="post-info-more">
+<section class="post-tags"><i class="fas fa-tags fa-fw"></i> <a href="/tags/java/">Java</a></section>
+<section>
+<span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span> | <span><a href="/">主页</a></span>
+</section>
+</div>
+<div class="post-nav"><a class="prev" href="/posts/python-pickle-unserialize/" rel="prev" title="Python pickle 反序列化安全简述"><i class="fas fa-angle-left fa-fw"></i>Python pickle 反序列化安全简述</a></div>
+</div>
+<div id="comments"><div class="comment" id="valine"></div><noscript>
+                Please enable JavaScript to view the comments powered by <a href="https://valine.js.org/">Valine</a>.
+            </noscript></div></article></div>
+</main><footer class="footer">
+<div class="footer-container"><div class="footer-line">由 <a href="https://gohugo.io/" rel="noopener noreffer" target="_blank" title="Hugo 0.85.0">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" rel="noopener noreffer" target="_blank" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+</div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2021</span><span class="author" itemprop="copyrightHolder"> <a href="/" target="_blank">X5tar</a></span> | <span class="license"><a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="license external nofollow noopener noreffer" target="_blank">CC BY-SA 4.0</a></span></div>
+</div>
+</footer></div>
+<div id="fixed-buttons"><a class="fixed-button" href="#" id="back-to-top" title="回到顶部">
+<i class="fas fa-arrow-up fa-fw"></i>
+</a><a class="fixed-button" href="#" id="view-comments" title="查看评论">
+<i class="fas fa-comment fa-fw"></i>
+</a>
+</div><link href="/lib/valine/valine.min.css" rel="stylesheet"/><link href="/lib/lightgallery/lightgallery.min.css" rel="stylesheet"/><script src="/lib/valine/Valine.min.js" type="text/javascript"></script><script src="/lib/smooth-scroll/smooth-scroll.min.js" type="text/javascript"></script><script src="/lib/lazysizes/lazysizes.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lightgallery.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-thumbnail.min.js" type="text/javascript"></script><script src="/lib/lightgallery/lg-zoom.min.js" type="text/javascript"></script><script src="/lib/clipboard/clipboard.min.js" type="text/javascript"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":10},"comment":{"valine":{"appId":"iAbQo5y0XlBlUP9F0K3Tyx8f-MdYXbMMI","appKey":"ML5YMAAFe45gCJawVJcUkrg0","el":"#valine","emojiCDN":"https://cdn.jsdelivr.net/npm/emoji-datasource-google@5.0.1/img/google/64/","emojiMaps":{"100":"1f4af.png","alien":"1f47d.png","anger":"1f4a2.png","angry":"1f620.png","anguished":"1f627.png","astonished":"1f632.png","black_heart":"1f5a4.png","blue_heart":"1f499.png","blush":"1f60a.png","bomb":"1f4a3.png","boom":"1f4a5.png","broken_heart":"1f494.png","brown_heart":"1f90e.png","clown_face":"1f921.png","cold_face":"1f976.png","cold_sweat":"1f630.png","confounded":"1f616.png","confused":"1f615.png","cry":"1f622.png","crying_cat_face":"1f63f.png","cupid":"1f498.png","dash":"1f4a8.png","disappointed":"1f61e.png","disappointed_relieved":"1f625.png","dizzy":"1f4ab.png","dizzy_face":"1f635.png","drooling_face":"1f924.png","exploding_head":"1f92f.png","expressionless":"1f611.png","face_vomiting":"1f92e.png","face_with_cowboy_hat":"1f920.png","face_with_hand_over_mouth":"1f92d.png","face_with_head_bandage":"1f915.png","face_with_monocle":"1f9d0.png","face_with_raised_eyebrow":"1f928.png","face_with_rolling_eyes":"1f644.png","face_with_symbols_on_mouth":"1f92c.png","face_with_thermometer":"1f912.png","fearful":"1f628.png","flushed":"1f633.png","frowning":"1f626.png","ghost":"1f47b.png","gift_heart":"1f49d.png","green_heart":"1f49a.png","grimacing":"1f62c.png","grin":"1f601.png","grinning":"1f600.png","hankey":"1f4a9.png","hear_no_evil":"1f649.png","heart":"2764-fe0f.png","heart_decoration":"1f49f.png","heart_eyes":"1f60d.png","heart_eyes_cat":"1f63b.png","heartbeat":"1f493.png","heartpulse":"1f497.png","heavy_heart_exclamation_mark_ornament":"2763-fe0f.png","hole":"1f573-fe0f.png","hot_face":"1f975.png","hugging_face":"1f917.png","hushed":"1f62f.png","imp":"1f47f.png","innocent":"1f607.png","japanese_goblin":"1f47a.png","japanese_ogre":"1f479.png","joy":"1f602.png","joy_cat":"1f639.png","kiss":"1f48b.png","kissing":"1f617.png","kissing_cat":"1f63d.png","kissing_closed_eyes":"1f61a.png","kissing_heart":"1f618.png","kissing_smiling_eyes":"1f619.png","laughing":"1f606.png","left_speech_bubble":"1f5e8-fe0f.png","love_letter":"1f48c.png","lying_face":"1f925.png","mask":"1f637.png","money_mouth_face":"1f911.png","nauseated_face":"1f922.png","nerd_face":"1f913.png","neutral_face":"1f610.png","no_mouth":"1f636.png","open_mouth":"1f62e.png","orange_heart":"1f9e1.png","partying_face":"1f973.png","pensive":"1f614.png","persevere":"1f623.png","pleading_face":"1f97a.png","pouting_cat":"1f63e.png","purple_heart":"1f49c.png","rage":"1f621.png","relaxed":"263a-fe0f.png","relieved":"1f60c.png","revolving_hearts":"1f49e.png","right_anger_bubble":"1f5ef-fe0f.png","robot_face":"1f916.png","rolling_on_the_floor_laughing":"1f923.png","scream":"1f631.png","scream_cat":"1f640.png","see_no_evil":"1f648.png","shushing_face":"1f92b.png","skull":"1f480.png","skull_and_crossbones":"2620-fe0f.png","sleeping":"1f634.png","sleepy":"1f62a.png","slightly_frowning_face":"1f641.png","slightly_smiling_face":"1f642.png","smile":"1f604.png","smile_cat":"1f638.png","smiley":"1f603.png","smiley_cat":"1f63a.png","smiling_face_with_3_hearts":"1f970.png","smiling_imp":"1f608.png","smirk":"1f60f.png","smirk_cat":"1f63c.png","sneezing_face":"1f927.png","sob":"1f62d.png","space_invader":"1f47e.png","sparkling_heart":"1f496.png","speak_no_evil":"1f64a.png","speech_balloon":"1f4ac.png","star-struck":"1f929.png","stuck_out_tongue":"1f61b.png","stuck_out_tongue_closed_eyes":"1f61d.png","stuck_out_tongue_winking_eye":"1f61c.png","sunglasses":"1f60e.png","sweat":"1f613.png","sweat_drops":"1f4a6.png","sweat_smile":"1f605.png","thinking_face":"1f914.png","thought_balloon":"1f4ad.png","tired_face":"1f62b.png","triumph":"1f624.png","two_hearts":"1f495.png","unamused":"1f612.png","upside_down_face":"1f643.png","weary":"1f629.png","white_frowning_face":"2639-fe0f.png","white_heart":"1f90d.png","wink":"1f609.png","woozy_face":"1f974.png","worried":"1f61f.png","yawning_face":"1f971.png","yellow_heart":"1f49b.png","yum":"1f60b.png","zany_face":"1f92a.png","zipper_mouth_face":"1f910.png","zzz":"1f4a4.png"},"enableQQ":null,"highlight":true,"lang":"zh-cn","placeholder":"你的评论 ...","recordIP":null,"visitor":null}},"lightGallery":{"actualSize":false,"exThumbImage":"data-thumbnail","hideBarsDelay":2000,"selector":".lightgallery","speed":400,"thumbContHeight":80,"thumbWidth":80,"thumbnail":true}};</script><script src="/js/theme.min.js" type="text/javascript"></script><script type="text/javascript">
+            window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());
+            gtag('config', 'UA-160185073-2');
+        </script><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-160185073-2" type="text/javascript"></script></body>
+</html>

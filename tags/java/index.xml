@@ -1,0 +1,15 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>Java - 标签 - X5tar&#39;s Blog</title>
+        <link>https://x5tar.com/tags/java/</link>
+        <description>Java - 标签 - X5tar&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>x5tar@qq.com (X5tar)</managingEditor>
+            <webMaster>x5tar@qq.com (X5tar)</webMaster><lastBuildDate>Wed, 14 Jul 2021 18:14:15 &#43;0800</lastBuildDate><atom:link href="https://x5tar.com/tags/java/" rel="self" type="application/rss+xml" /><item>
+    <title>Java 安全学习 Day1 -- 基础知识</title>
+    <link>https://x5tar.com/posts/java-sec-day1/</link>
+    <pubDate>Wed, 14 Jul 2021 18:14:15 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://x5tar.com/posts/java-sec-day1/</guid>
+    <description><![CDATA[0x00 前言 这个暑假一定学 Java &ndash; 🌟 0x01 反射 反射式编程是指计算机程序在运行时（runtime）可以访问、检测和修改它本身状态或行为的一种能力。 在 Java 中，反]]></description>
+</item></channel>
+</rss>
